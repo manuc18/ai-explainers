@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discrete Mathematics — Interactive Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,opsz,wght@0,8..144,400;0,8..144,500;0,8..144,600;1,8..144,400&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060a14;
+  --surface: #0c1220;
+  --surface2: #111b2e;
+  --border: #1a2840;
+  --border2: #253655;
+  --text: #c4d4e8;
+  --text-dim: #4e6480;
+  --text-bright: #e8f0f8;
+  --logic: #f59e0b;
+  --proofs: #2dd4bf;
+  --sets: #a78bfa;
+  --logic-dim: rgba(245,158,11,0.1);
+  --proofs-dim: rgba(45,212,191,0.1);
+  --sets-dim: rgba(167,139,250,0.1);
+  --logic-border: rgba(245,158,11,0.25);
+  --proofs-border: rgba(45,212,191,0.25);
+  --sets-border: rgba(167,139,250,0.25);
+  --red: #f87171; --green: #4ade80; --blue: #60a5fa;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'EB Garamond',Georgia,serif;font-size:17px;line-height:1.8;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(96,165,250,0.04) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;z-index:0}
+
+/* ── HEADER ── */
+.site-header{position:sticky;top:0;z-index:100;background:rgba(6,10,20,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;gap:1rem;height:58px}
+.logo{font-family:'Cinzel',serif;font-size:1.1rem;font-weight:700;color:var(--text-bright);text-decoration:none;white-space:nowrap;letter-spacing:.04em}
+.logo span{color:var(--logic)}
+.tab-nav{display:flex;gap:4px;margin-left:1rem}
+.tab-btn{font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.08em;padding:6px 18px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab-btn.active-logic{background:var(--logic-dim);color:var(--logic);border-color:var(--logic-border)}
+.tab-btn.active-proofs{background:var(--proofs-dim);color:var(--proofs);border-color:var(--proofs-border)}
+.tab-btn.active-sets{background:var(--sets-dim);color:var(--sets);border-color:var(--sets-border)}
+.tab-btn:hover:not(.active-logic):not(.active-proofs):not(.active-sets){border-color:var(--border2);color:var(--text)}
+.toc-strip{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-left:auto}
+.toc-strip::-webkit-scrollbar{display:none}
+.toc-pill{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;padding:3px 9px;border-radius:3px;border:1px solid transparent;white-space:nowrap;transition:all .2s}
+.toc-pill:hover{color:var(--text);border-color:var(--border2)}
+
+/* ── TAB PANELS ── */
+.tab-panel{display:none;position:relative;z-index:1}
+.tab-panel.active{display:block}
+
+/* ── HERO ── */
+.tab-hero{padding:60px 2rem 44px;max-width:860px;margin:0 auto}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:12px}
+.logic .hero-eyebrow{color:var(--logic)}
+.proofs .hero-eyebrow{color:var(--proofs)}
+.sets .hero-eyebrow{color:var(--sets)}
+.tab-hero h1{font-family:'Cinzel',serif;font-size:clamp(1.9rem,4.5vw,3.2rem);font-weight:700;line-height:1.15;color:var(--text-bright);margin-bottom:14px}
+.tab-hero p{color:var(--text-dim);max-width:560px;font-size:1rem}
+.hero-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.chip{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:3px;border:1px solid var(--border)}
+.logic .chip{border-color:var(--logic-border);color:var(--logic)}
+.proofs .chip{border-color:var(--proofs-border);color:var(--proofs)}
+.sets .chip{border-color:var(--sets-border);color:var(--sets)}
+
+/* ── CONTENT ── */
+.content{max-width:860px;margin:0 auto;padding:0 2rem 80px}
+.section{padding:44px 0 32px;border-bottom:1px solid var(--border)}
+.section:last-child{border-bottom:none}
+.section-id{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
+.logic .section-id{color:var(--logic)}
+.proofs .section-id{color:var(--proofs)}
+.sets .section-id{color:var(--sets)}
+.section h2{font-family:'Cinzel',serif;font-size:1.55rem;font-weight:700;color:var(--text-bright);margin-bottom:16px;line-height:1.25}
+.section p{margin-bottom:12px}
+.section p:last-child{margin-bottom:0}
+em{font-style:italic;color:var(--text-bright)}
+strong{font-weight:600;color:var(--text-bright)}
+
+/* ── DEFINITION/THEOREM BOXES ── */
+.def-box{background:var(--surface);border-radius:7px;padding:16px 20px;margin:18px 0;border:1px solid var(--border)}
+.def-box.logic{border-left:3px solid var(--logic)}
+.def-box.proofs{border-left:3px solid var(--proofs)}
+.def-box.sets{border-left:3px solid var(--sets)}
+.def-label{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.logic .def-label,.def-box.logic .def-label{color:var(--logic)}
+.proofs .def-label,.def-box.proofs .def-label{color:var(--proofs)}
+.sets .def-label,.def-box.sets .def-label{color:var(--sets)}
+.def-box p{margin:0;color:var(--text)}
+
+/* ── MATH DISPLAY ── */
+.math{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:14px 18px;margin:14px 0;overflow-x:auto;line-height:1.8;color:var(--blue)}
+.math .hi-logic{color:var(--logic)}
+.math .hi-proofs{color:var(--proofs)}
+.math .hi-sets{color:var(--sets)}
+.math .dim{color:var(--text-dim);font-style:italic}
+.math .red{color:var(--red)}
+.math .green{color:var(--green)}
+
+/* ── CALLOUTS ── */
+.callout{border-left:2px solid var(--blue);background:rgba(96,165,250,0.06);border-radius:0 5px 5px 0;padding:12px 16px;margin:14px 0;font-size:.9rem}
+.callout.warn{border-left-color:var(--logic);background:var(--logic-dim)}
+.callout.good{border-left-color:var(--green);background:rgba(74,222,128,0.06)}
+.callout.note{border-left-color:var(--sets);background:var(--sets-dim)}
+
+/* ── DEMO BOX ── */
+.demo-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px;margin:22px 0;position:relative}
+.demo-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.logic .demo-title,.demo-box.logic .demo-title{color:var(--logic)}
+.proofs .demo-title,.demo-box.proofs .demo-title{color:var(--proofs)}
+.sets .demo-title,.demo-box.sets .demo-title{color:var(--sets)}
+.demo-caption{font-size:.82rem;color:var(--text-dim);margin-top:12px;line-height:1.6;font-style:italic}
+
+/* ── BUTTONS ── */
+button{font-family:'JetBrains Mono',monospace;font-size:11px;padding:7px 16px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;transition:all .2s}
+button:hover{border-color:var(--border2);color:var(--text-bright)}
+.btn-logic{background:var(--logic);color:#000;border-color:var(--logic);font-weight:700}
+.btn-logic:hover{background:#fbbf24;border-color:#fbbf24}
+.btn-proofs{background:var(--proofs);color:#000;border-color:var(--proofs);font-weight:700}
+.btn-sets{background:var(--sets);color:#000;border-color:var(--sets);font-weight:700}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* ── INPUT FIELDS ── */
+.formula-input{width:100%;background:var(--surface2);color:var(--blue);font-family:'JetBrains Mono',monospace;font-size:13px;border:1px solid var(--border);border-radius:5px;padding:10px 14px;outline:none;transition:border-color .2s}
+.formula-input:focus{border-color:var(--logic)}
+.formula-input.proofs:focus{border-color:var(--proofs)}
+.formula-input.sets:focus{border-color:var(--sets)}
+.input-hint{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:5px}
+
+/* ── TRUTH TABLE ── */
+.truth-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:12px}
+.truth-table th{background:var(--surface2);color:var(--logic);font-size:11px;padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:500}
+.truth-table td{padding:6px 12px;border:1px solid var(--border);text-align:center;transition:background .2s}
+.truth-table tr:nth-child(even) td{background:rgba(255,255,255,0.02)}
+.truth-table .val-T{color:var(--green);font-weight:600}
+.truth-table .val-F{color:var(--red)}
+.truth-table .result-T{background:rgba(74,222,128,0.08)!important}
+.truth-table .result-F{background:rgba(248,113,113,0.06)!important}
+
+/* ── OPERATOR TABLE ── */
+.op-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0}
+.op-card{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px;cursor:pointer;transition:border-color .2s}
+.op-card:hover{border-color:var(--logic-border)}
+.op-card.selected{border-color:var(--logic);background:var(--logic-dim)}
+.op-symbol{font-family:'JetBrains Mono',monospace;font-size:1.4rem;color:var(--logic);margin-bottom:4px}
+.op-name{font-family:'Cinzel',serif;font-size:.78rem;color:var(--text-dim);margin-bottom:6px}
+.op-desc{font-size:.83rem;color:var(--text-dim)}
+
+/* ── EQUIVALENCE TABLE ── */
+.equiv-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
+.equiv-table th{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--logic);border-bottom:1px solid var(--border);padding:7px 12px;text-align:left}
+.equiv-table td{padding:8px 12px;border-bottom:1px solid rgba(26,40,64,0.8);font-family:'JetBrains Mono',monospace;font-size:12px}
+.equiv-table tr:last-child td{border-bottom:none}
+.equiv-table .name{color:var(--text-dim);font-family:'EB Garamond',serif;font-size:.9rem}
+.equiv-table .law{color:var(--blue)}
+
+/* ── QUANTIFIER VIZ ── */
+.domain-grid{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.domain-el{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:5px;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;cursor:default;transition:all .3s}
+.domain-el.satisfied{border-color:var(--green);background:rgba(74,222,128,0.12);color:var(--green)}
+.domain-el.unsatisfied{border-color:var(--red);background:rgba(248,113,113,0.08);color:var(--red)}
+.quant-result{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;padding:12px 16px;border-radius:5px;margin-top:10px;text-align:center}
+.quant-T{background:rgba(74,222,128,0.1);color:var(--green);border:1px solid rgba(74,222,128,0.3)}
+.quant-F{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.3)}
+
+/* ── RULES OF INFERENCE ── */
+.rule-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:12px 0}
+.rule-table th{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--logic);border-bottom:1px solid var(--border);padding:8px 12px;text-align:left}
+.rule-table td{padding:9px 12px;border-bottom:1px solid rgba(26,40,64,0.7);vertical-align:top}
+.rule-table tr:last-child td{border-bottom:none}
+.rule-form{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue)}
+.rule-name{font-family:'Cinzel',serif;font-size:.82rem;color:var(--text-dim)}
+
+/* ── PROOF STEPS ── */
+.proof-steps{display:grid;gap:8px;margin:14px 0}
+.proof-step{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;opacity:0;transform:translateY(6px);transition:all .35s;cursor:default}
+.proof-step.revealed{opacity:1;transform:translateY(0)}
+.step-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);margin-bottom:4px}
+.step-content{font-size:.92rem;color:var(--text-bright)}
+.step-reason{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--proofs);margin-top:4px}
+.step-math{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--blue);margin:4px 0}
+
+/* ── K-MAP ── */
+.kmap-wrapper{overflow-x:auto;margin:14px 0}
+.kmap-table{border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:12px}
+.kmap-table td,.kmap-table th{border:1px solid var(--border);width:56px;height:52px;text-align:center;vertical-align:middle;position:relative}
+.kmap-table th{background:var(--surface2);color:var(--logic);font-size:11px;width:auto;padding:0 10px}
+.kmap-cell{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;position:relative}
+.kmap-cell:hover{background:rgba(245,158,11,0.08)}
+.kmap-cell.active{background:rgba(245,158,11,0.18)}
+.kmap-cell .minterm{font-size:9px;color:var(--text-dim);position:absolute;top:3px;left:4px}
+.kmap-cell .val{font-size:16px;font-weight:600}
+.kmap-cell.val1 .val{color:var(--logic)}
+.kmap-cell.val0 .val{color:var(--text-dim)}
+.kmap-cell.group0{outline:2px solid rgba(74,222,128,0.6);outline-offset:-2px}
+.kmap-cell.group1{outline:2px solid rgba(96,165,250,0.6);outline-offset:-3px}
+.kmap-cell.group2{outline:2px solid rgba(248,113,113,0.6);outline-offset:-4px}
+.kmap-cell.group3{outline:2px solid rgba(167,139,250,0.6);outline-offset:-5px}
+.kmap-result{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--logic);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;margin-top:12px;min-height:40px}
+
+/* ── CIRCUIT GATE ── */
+.circuit-row{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
+.gate-in{display:flex;align-items:center;gap:6px}
+.gate-toggle{width:36px;height:36px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);font-family:'JetBrains Mono',monospace;font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.gate-toggle.on{background:var(--logic);color:#000;border-color:var(--logic)}
+.gate-box{background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;text-align:center;min-width:70px}
+.gate-out{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;padding:6px 14px;border-radius:4px;transition:all .2s}
+.gate-out.T{color:var(--green);background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3)}
+.gate-out.F{color:var(--red);background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2)}
+
+/* ── VENN ── */
+#vennCanvas{border-radius:8px;border:1px solid var(--border)}
+.venn-btns{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.vbtn{font-size:11px;padding:5px 12px}
+.vbtn.active{background:var(--sets);color:#000;border-color:var(--sets);font-weight:700}
+
+/* ── CANTOR ── */
+.cantor-grid{display:grid;gap:2px;margin:14px 0;overflow-x:auto}
+.cantor-row{display:flex;gap:2px;align-items:center}
+.cantor-cell{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;border-radius:3px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);transition:all .4s;flex-shrink:0}
+.cantor-cell.diagonal{border-color:var(--sets);color:var(--sets);background:var(--sets-dim)}
+.cantor-cell.diag-highlight{background:rgba(167,139,250,0.3);color:var(--sets);border-color:var(--sets);font-weight:700}
+.cantor-cell.flipped{background:rgba(248,113,113,0.15);color:var(--red);border-color:var(--red);font-weight:700}
+.cantor-cell.new-row{border-color:var(--red);color:var(--red);background:rgba(248,113,113,0.12)}
+.cantor-row-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);min-width:28px;text-align:right;flex-shrink:0;padding-right:4px}
+
+/* ── SET OPERATIONS TABLE ── */
+.set-ops{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.set-op-card{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px;cursor:pointer;transition:all .2s}
+.set-op-card:hover,.set-op-card.sel{border-color:var(--sets-border);background:var(--sets-dim)}
+.set-op-sym{font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--sets);margin-bottom:3px}
+.set-op-name{font-family:'Cinzel',serif;font-size:.78rem;color:var(--text-dim);margin-bottom:4px}
+.set-op-def{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim)}
+
+/* ── QUIZ ── */
+.quiz-option{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:9px 14px;cursor:pointer;margin:5px 0;font-size:.9rem;transition:all .2s;width:100%;text-align:left;color:var(--text);font-family:'EB Garamond',serif}
+.quiz-option:hover{border-color:var(--border2)}
+.quiz-option.correct{background:rgba(74,222,128,0.1);border-color:var(--green);color:var(--green)}
+.quiz-option.wrong{background:rgba(248,113,113,0.08);border-color:var(--red);color:var(--red)}
+.quiz-explain{background:rgba(96,165,250,0.06);border-left:2px solid var(--blue);padding:10px 14px;margin-top:8px;font-size:.85rem;color:var(--text-dim);display:none;line-height:1.7;font-family:'JetBrains Mono',monospace}
+.quiz-explain.show{display:block}
+
+/* ── FLASHCARD ── */
+.fc-grid{display:grid;gap:8px}
+.fc{background:var(--surface2);border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.fc:hover{border-color:var(--border2)}
+.fc-q{padding:11px 16px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.fc-qt{font-size:.9rem;flex:1;color:var(--text-bright);font-family:'JetBrains Mono',monospace;font-size:12px}
+.fc-tog{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);white-space:nowrap;padding-top:2px}
+.fc-a{display:none;padding:11px 16px;border-top:1px solid var(--border);font-size:.85rem;color:var(--text-dim);line-height:1.7}
+.fc-a.show{display:block}
+
+/* ── SATISFACTION BADGE ── */
+.sat-badge{display:inline-block;font-family:'Cinzel',serif;font-size:.82rem;padding:4px 14px;border-radius:4px;margin-top:8px}
+.sat-tautology{background:rgba(74,222,128,0.12);color:var(--green);border:1px solid rgba(74,222,128,0.3)}
+.sat-contradiction{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2)}
+.sat-contingency{background:rgba(245,158,11,0.1);color:var(--logic);border:1px solid var(--logic-border)}
+
+/* ── COUNTABILITY ── */
+.count-chart{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.count-set{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:14px 18px;text-align:center;min-width:130px}
+.count-sym{font-family:'Cinzel',serif;font-size:1.5rem;color:var(--sets);margin-bottom:4px}
+.count-name{font-size:.82rem;color:var(--text-dim);margin-bottom:6px}
+.count-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;display:inline-block}
+.count-yes{background:rgba(74,222,128,0.1);color:var(--green);border:1px solid rgba(74,222,128,0.3)}
+.count-no{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2)}
+
+/* ── TABLE INFO ── */
+.info-table{width:100%;border-collapse:collapse;font-size:.87rem;margin:12px 0}
+.info-table th{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);padding:8px 12px;text-align:left}
+.logic .info-table th{color:var(--logic)} .proofs .info-table th{color:var(--proofs)} .sets .info-table th{color:var(--sets)}
+.info-table td{padding:8px 12px;border-bottom:1px solid rgba(26,40,64,0.6);vertical-align:top}
+.info-table tr:last-child td{border-bottom:none}
+.info-table code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue);background:var(--surface2);padding:1px 5px;border-radius:3px}
+
+/* ── SLIDER ── */
+input[type=range]{-webkit-appearance:none;appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;flex:1}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--logic);border-radius:50%}
+.slider-row{display:flex;align-items:center;gap:12px;margin:10px 0}
+.slider-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap}
+.slider-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--logic);min-width:28px}
+
+select.prop-sel{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:5px 8px;cursor:pointer}
+
+@media(max-width:600px){.toc-strip{display:none}.tab-hero h1{font-size:1.6rem}.op-grid{grid-template-columns:1fr 1fr}.set-ops{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="#"><span>∂</span>iscrete Math</a>
+  <div class="tab-nav">
+    <button class="tab-btn active-logic" data-tab="logic">I. Logic</button>
+    <button class="tab-btn" data-tab="proofs">II. Proofs</button>
+    <button class="tab-btn" data-tab="sets">III. Sets</button>
+  </div>
+  <nav class="toc-strip" id="tocStrip"></nav>
+</header>
+
+<!-- ═══════════════════ TAB 1: LOGIC ═══════════════════ -->
+<div class="tab-panel active logic" id="tab-logic">
+<div class="tab-hero">
+  <div class="hero-eyebrow">● Tab I — Propositional & Predicate Logic</div>
+  <h1>The Language of<br>Mathematical Truth</h1>
+  <p>From atomic propositions to circuits — build up the full machinery of logical reasoning, with interactive tools to see every concept live.</p>
+  <div class="hero-chips">
+    <span class="chip">Propositions</span><span class="chip">Operators</span><span class="chip">Truth Tables</span>
+    <span class="chip">Equivalence</span><span class="chip">Quantifiers</span><span class="chip">Inference</span>
+    <span class="chip">Normal Forms</span><span class="chip">K-Map</span>
+  </div>
+</div>
+<div class="content">
+
+<!-- §1 Propositional Logic -->
+<section class="section" id="L1">
+  <div class="section-id">§1 — Propositional Logic</div>
+  <h2>Propositions — The Atoms of Logic</h2>
+  <p>A <em>proposition</em> is a declarative statement that is either <strong>true (T)</strong> or <strong>false (F)</strong> — never both, never neither. Propositions are the building blocks of all logical reasoning.</p>
+  <div class="def-box logic">
+    <div class="def-label">Definition</div>
+    <p>A <strong>proposition</strong> is a statement with a definite truth value. We use variables <span style="font-family:'JetBrains Mono',monospace;color:var(--blue)">p, q, r, s</span> to denote propositions.</p>
+  </div>
+  <div class="demo-box logic">
+    <div class="demo-title">▶ Quiz — Is It a Proposition?</div>
+    <div data-quiz="0">
+      <p style="margin-bottom:10px;font-size:.92rem;">Which of these is a proposition?</p>
+      <button class="quiz-option" data-correct="false">What time is it?</button>
+      <button class="quiz-option" data-correct="false">x + 2 = 7 (with x unknown)</button>
+      <button class="quiz-option" data-correct="true">The square root of 4 is 2.</button>
+      <button class="quiz-option" data-correct="false">Close the door!</button>
+      <div class="quiz-explain">✓ "The square root of 4 is 2" is TRUE — it's a proposition. Questions and commands have no truth value. "x + 2 = 7" is a predicate (open statement) — its truth depends on x.</div>
+    </div>
+    <div style="margin-top:18px;" data-quiz="1">
+      <p style="margin-bottom:10px;font-size:.92rem;">Is "This statement is false" a proposition?</p>
+      <button class="quiz-option" data-correct="false">Yes — it's false.</button>
+      <button class="quiz-option" data-correct="false">Yes — it's true.</button>
+      <button class="quiz-option" data-correct="true">No — it's a paradox (neither T nor F).</button>
+      <div class="quiz-explain">✓ This is the Liar's Paradox. If true, it's false. If false, it's true. It cannot be assigned a consistent truth value, so it's NOT a proposition. Formal logic avoids self-referential statements.</div>
+    </div>
+  </div>
+</section>
+
+<!-- §2 Logical Operators -->
+<section class="section" id="L2">
+  <div class="section-id">§2 — Logical Operators</div>
+  <h2>The Six Logical Connectives</h2>
+  <p>New propositions are formed by combining simpler ones using <em>logical connectives</em>. Each has a precise definition via its truth table.</p>
+  <div class="op-grid" id="opGrid">
+    <div class="op-card" data-op="not"><div class="op-symbol">¬</div><div class="op-name">Negation (NOT)</div><div class="op-desc">Flips the truth value. ¬p is true iff p is false.</div></div>
+    <div class="op-card" data-op="and"><div class="op-symbol">∧</div><div class="op-name">Conjunction (AND)</div><div class="op-desc">True only when both p and q are true.</div></div>
+    <div class="op-card" data-op="or"><div class="op-symbol">∨</div><div class="op-name">Disjunction (OR)</div><div class="op-desc">True when at least one of p, q is true.</div></div>
+    <div class="op-card" data-op="implies"><div class="op-symbol">→</div><div class="op-name">Implication (IF→THEN)</div><div class="op-desc">False only when p is true and q is false.</div></div>
+    <div class="op-card" data-op="iff"><div class="op-symbol">↔</div><div class="op-name">Biconditional (IFF)</div><div class="op-desc">True when p and q have the same value.</div></div>
+    <div class="op-card" data-op="xor"><div class="op-symbol">⊕</div><div class="op-name">Exclusive OR (XOR)</div><div class="op-desc">True when exactly one of p, q is true.</div></div>
+  </div>
+  <div id="opDetail" style="display:none;margin-top:10px;"></div>
+  <div class="callout warn" style="margin-top:14px;">
+    <strong>The implication trap:</strong> p → q is <em>only false</em> when p is true and q is false. "If it rains, I carry an umbrella" is vacuously TRUE on sunny days — the premise is false, so the implication cannot be violated.
+  </div>
+  <div class="math">
+  <span class="hi-logic">Precedence (high → low):</span>  ¬  &gt;  ∧  &gt;  ∨  &gt;  →  &gt;  ↔
+  <br><span class="dim">So: ¬p ∧ q → r  parses as  (¬p) ∧ q) → r</span>
+  </div>
+</section>
+
+<!-- §3 Truth Table Builder -->
+<section class="section" id="L3">
+  <div class="section-id">§3 — Truth Tables & Satisfiability</div>
+  <h2>Truth Table Builder</h2>
+  <p>A <em>truth table</em> systematically lists all possible truth values for all combinations of inputs. Enter any formula using the symbols below to generate its truth table instantly.</p>
+  <div class="demo-box logic">
+    <div class="demo-title">▶ Interactive Truth Table Generator</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <button style="font-size:13px;padding:5px 10px;" onclick="insertSym('¬')">¬</button>
+      <button style="font-size:13px;padding:5px 10px;" onclick="insertSym('∧')">∧</button>
+      <button style="font-size:13px;padding:5px 10px;" onclick="insertSym('∨')">∨</button>
+      <button style="font-size:13px;padding:5px 10px;" onclick="insertSym('→')">→</button>
+      <button style="font-size:13px;padding:5px 10px;" onclick="insertSym('↔')">↔</button>
+      <button style="font-size:13px;padding:5px 10px;" onclick="insertSym('⊕')">⊕</button>
+    </div>
+    <input class="formula-input" id="ttFormula" placeholder="e.g.  (p → q) ↔ (¬p ∨ q)" value="(p → q) ↔ (¬p ∨ q)">
+    <div class="input-hint">Use: ¬ ~ ! | ∧ & | ∨ | | → -> | ↔ <-> | ⊕ ^ | variables: p q r s</div>
+    <div class="btn-row"><button class="btn-logic" onclick="buildTruthTable()">Generate Truth Table</button><button onclick="loadExample('tt')">Try Example</button></div>
+    <div id="ttOutput" style="margin-top:14px;overflow-x:auto;"></div>
+    <div id="satBadge" style="margin-top:6px;"></div>
+    <p class="demo-caption">Tautology = always T. Contradiction = always F. Contingency = sometimes T, sometimes F.</p>
+  </div>
+</section>
+
+<!-- §4 Logical Equivalence -->
+<section class="section" id="L4">
+  <div class="section-id">§4 — Logical Equivalence</div>
+  <h2>Logical Equivalence & the Key Laws</h2>
+  <p>Two formulas are <em>logically equivalent</em> (written <strong>p ≡ q</strong>) if they have the same truth value for every possible assignment of variables. Equivalence is the foundation of algebraic manipulation in logic.</p>
+  <table class="equiv-table">
+    <thead><tr><th>Name</th><th>Law</th></tr></thead>
+    <tbody>
+      <tr><td class="name">Double Negation</td><td class="law">¬¬p ≡ p</td></tr>
+      <tr><td class="name">De Morgan's (AND)</td><td class="law">¬(p ∧ q) ≡ ¬p ∨ ¬q</td></tr>
+      <tr><td class="name">De Morgan's (OR)</td><td class="law">¬(p ∨ q) ≡ ¬p ∧ ¬q</td></tr>
+      <tr><td class="name">Implication</td><td class="law">p → q ≡ ¬p ∨ q</td></tr>
+      <tr><td class="name">Contrapositive</td><td class="law">p → q ≡ ¬q → ¬p</td></tr>
+      <tr><td class="name">Biconditional</td><td class="law">p ↔ q ≡ (p → q) ∧ (q → p)</td></tr>
+      <tr><td class="name">Distributive (∧ over ∨)</td><td class="law">p ∧ (q ∨ r) ≡ (p ∧ q) ∨ (p ∧ r)</td></tr>
+      <tr><td class="name">Absorption</td><td class="law">p ∨ (p ∧ q) ≡ p</td></tr>
+      <tr><td class="name">Idempotent</td><td class="law">p ∨ p ≡ p  |  p ∧ p ≡ p</td></tr>
+      <tr><td class="name">Identity</td><td class="law">p ∨ F ≡ p  |  p ∧ T ≡ p</td></tr>
+      <tr><td class="name">Domination</td><td class="law">p ∨ T ≡ T  |  p ∧ F ≡ F</td></tr>
+    </tbody>
+  </table>
+  <div class="demo-box logic">
+    <div class="demo-title">▶ Equivalence Checker — Are Two Formulas Equivalent?</div>
+    <input class="formula-input" id="eqF1" placeholder="Formula 1, e.g.  p → q" value="p → q" style="margin-bottom:8px;">
+    <input class="formula-input" id="eqF2" placeholder="Formula 2, e.g.  ¬p ∨ q" value="¬p ∨ q">
+    <div class="btn-row"><button class="btn-logic" onclick="checkEquiv()">Check Equivalence</button></div>
+    <div id="eqResult" style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:13px;"></div>
+  </div>
+</section>
+
+<!-- §5 Predicate Logic -->
+<section class="section" id="L5">
+  <div class="section-id">§5 — Predicate Logic</div>
+  <h2>Predicate Logic — Reasoning Over Domains</h2>
+  <p>Propositional logic treats statements as indivisible atoms. <em>Predicate logic</em> (first-order logic) breaks them open — it lets us reason about the <strong>properties of objects</strong> and <strong>relationships between them</strong>.</p>
+  <div class="def-box logic">
+    <div class="def-label">Definition</div>
+    <p>A <strong>predicate</strong> P(x) is a function from a domain D to {T, F}. It becomes a proposition once x is assigned a value. The <strong>domain of discourse</strong> specifies the set of allowable values for variables.</p>
+  </div>
+  <div class="math">
+  P(x):  "x is even"      <span class="dim">→  P(4) = T,  P(7) = F</span>
+  Q(x,y): "x &gt; y"     <span class="dim">→  Q(5,3) = T,  Q(2,8) = F</span>
+  R(x):  "x² = x"         <span class="dim">→  R(0) = T,  R(1) = T,  R(2) = F</span>
+  </div>
+  <div class="callout">
+    <strong>Key difference:</strong> P(x) alone is an <em>open statement</em> — not a proposition. It becomes one when you substitute a value OR when you bind x with a quantifier (∀x or ∃x).
+  </div>
+</section>
+
+<!-- §6 Quantifiers -->
+<section class="section" id="L6">
+  <div class="section-id">§6 — Quantifiers</div>
+  <h2>Universal & Existential Quantifiers</h2>
+  <div class="def-box logic">
+    <div class="def-label">Universal Quantifier</div>
+    <p><strong>∀x P(x)</strong> — "For all x in the domain, P(x) is true."<br>To <em>disprove</em>: find one counterexample. To <em>prove</em>: show it holds for every element.</p>
+  </div>
+  <div class="def-box logic">
+    <div class="def-label">Existential Quantifier</div>
+    <p><strong>∃x P(x)</strong> — "There exists at least one x in the domain such that P(x) is true."<br>To <em>prove</em>: find one witness. To <em>disprove</em>: show it fails for all elements.</p>
+  </div>
+  <div class="demo-box logic">
+    <div class="demo-title">▶ Quantifier Visualizer</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+      <div><div class="input-hint" style="margin-bottom:4px;">Domain</div>
+        <select class="prop-sel" id="qDomain">
+          <option value="1,2,3,4,5,6,7,8,9,10">ℕ: {1..10}</option>
+          <option value="-3,-2,-1,0,1,2,3">ℤ: {-3..3}</option>
+          <option value="2,3,4,5,6,7,8,9">Natural {2..9}</option>
+        </select>
+      </div>
+      <div><div class="input-hint" style="margin-bottom:4px;">Predicate P(x)</div>
+        <select class="prop-sel" id="qPred">
+          <option value="even">x is even</option>
+          <option value="gt3">x > 3</option>
+          <option value="prime">x is prime</option>
+          <option value="pos">x > 0</option>
+          <option value="square">x is a perfect square</option>
+          <option value="div3">x is divisible by 3</option>
+        </select>
+      </div>
+    </div>
+    <div class="domain-grid" id="domainGrid"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+      <div class="quant-result" id="univResult">∀x P(x) = ?</div>
+      <div class="quant-result" id="existResult">∃x P(x) = ?</div>
+    </div>
+    <p class="demo-caption">Green = P(x) satisfied. Red = P(x) fails. ∀ needs ALL green. ∃ needs at least ONE green.</p>
+  </div>
+  <div class="math">
+  <span class="hi-logic">Negation Rules (De Morgan's for Quantifiers):</span>
+  ¬∀x P(x)  ≡  ∃x ¬P(x)     <span class="dim">"not all" = "some don't"</span>
+  ¬∃x P(x)  ≡  ∀x ¬P(x)     <span class="dim">"none" = "all don't"</span>
+  </div>
+</section>
+
+<!-- §7 Nested Quantifiers -->
+<section class="section" id="L7">
+  <div class="section-id">§7 — Nested Quantifiers</div>
+  <h2>Nested Quantifiers — Order Matters!</h2>
+  <p>When multiple quantifiers bind different variables, the order is critically important. Swapping them can completely change the meaning.</p>
+  <div class="math">
+  <span class="hi-logic">Domain: ℝ (real numbers),  P(x,y): x + y = 0</span>
+
+  ∀x ∀y P(x,y)  <span class="dim">→ "For all x AND all y, x+y=0"</span>          <span class="red">FALSE</span>
+  ∃x ∃y P(x,y)  <span class="dim">→ "Some x and some y exist where x+y=0"</span>    <span class="green">TRUE</span> (e.g. x=1, y=-1)
+  ∀x ∃y P(x,y)  <span class="dim">→ "For every x, there's a y with x+y=0"</span>    <span class="green">TRUE</span> (y = -x always works)
+  ∃x ∀y P(x,y)  <span class="dim">→ "One fixed x works for ALL y simultaneously"</span> <span class="red">FALSE</span>
+  </div>
+  <div class="callout warn">
+    <strong>∀x ∃y</strong> vs <strong>∃y ∀x</strong>: In the first, y can depend on x. In the second, one y must work for all x simultaneously. The second is much stronger!
+  </div>
+  <table class="info-table">
+    <thead><tr><th>Statement</th><th>Reading</th><th>Strength</th></tr></thead>
+    <tbody>
+      <tr><td>∀x ∀y P(x,y)</td><td>Every pair (x,y) satisfies P</td><td>Strongest (hardest to prove)</td></tr>
+      <tr><td>∀x ∃y P(x,y)</td><td>For each x, some y works</td><td>Strong</td></tr>
+      <tr><td>∃x ∀y P(x,y)</td><td>One x works for all y</td><td>Moderately strong</td></tr>
+      <tr><td>∃x ∃y P(x,y)</td><td>Some pair (x,y) satisfies P</td><td>Weakest (easiest to prove)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- §8 Rules of Inference -->
+<section class="section" id="L8">
+  <div class="section-id">§8 — Rules of Inference</div>
+  <h2>Rules of Inference — Valid Argument Forms</h2>
+  <p>An <em>argument</em> is a sequence of statements (premises) leading to a conclusion. An argument is <em>valid</em> if the conclusion follows necessarily from the premises via a rule of inference.</p>
+  <table class="rule-table">
+    <thead><tr><th>Name</th><th>Form</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td class="rule-name">Modus Ponens</td><td class="rule-form">p, p→q  ⊢  q</td><td>"It rains. If rain→wet. ∴ wet."</td></tr>
+      <tr><td class="rule-name">Modus Tollens</td><td class="rule-form">¬q, p→q  ⊢  ¬p</td><td>"Not wet. If rain→wet. ∴ no rain."</td></tr>
+      <tr><td class="rule-name">Hypothetical Syllogism</td><td class="rule-form">p→q, q→r  ⊢  p→r</td><td>Chaining implications</td></tr>
+      <tr><td class="rule-name">Disjunctive Syllogism</td><td class="rule-form">p∨q, ¬p  ⊢  q</td><td>"A or B. Not A. ∴ B."</td></tr>
+      <tr><td class="rule-name">Addition</td><td class="rule-form">p  ⊢  p∨q</td><td>"It rains. ∴ it rains or snows."</td></tr>
+      <tr><td class="rule-name">Simplification</td><td class="rule-form">p∧q  ⊢  p</td><td>"It rains and is cold. ∴ it rains."</td></tr>
+      <tr><td class="rule-name">Conjunction</td><td class="rule-form">p, q  ⊢  p∧q</td><td>"It rains. It's cold. ∴ both."</td></tr>
+      <tr><td class="rule-name">Resolution</td><td class="rule-form">p∨q, ¬p∨r  ⊢  q∨r</td><td>SAT solvers use this</td></tr>
+    </tbody>
+  </table>
+  <div class="demo-box logic">
+    <div class="demo-title">▶ Modus Ponens — Step-Through Proof</div>
+    <div class="proof-steps" id="mpSteps">
+      <div class="proof-step"><div class="step-num">Premise 1</div><div class="step-math">p: "The number n is divisible by 6."</div></div>
+      <div class="proof-step"><div class="step-num">Premise 2</div><div class="step-math">p → q: "If n is divisible by 6, then n is divisible by 2."</div></div>
+      <div class="proof-step"><div class="step-num">Apply Modus Ponens: p, (p → q) ⊢ q</div><div class="step-math">q: "∴ n is divisible by 2." ✓</div><div class="step-reason">Valid! The conclusion follows necessarily from the premises.</div></div>
+    </div>
+    <div class="btn-row"><button class="btn-logic" id="mpRevealBtn">Reveal Steps One by One</button><button id="mpResetBtn">Reset</button></div>
+  </div>
+</section>
+
+<!-- §9 Normal Forms -->
+<section class="section" id="L9">
+  <div class="section-id">§9 — Normal Forms</div>
+  <h2>DNF and CNF — Canonical Forms</h2>
+  <p>Every propositional formula can be rewritten in two canonical forms, useful for circuit design, SAT solving, and theorem proving.</p>
+  <div class="def-box logic">
+    <div class="def-label">Disjunctive Normal Form (DNF)</div>
+    <p>An <em>OR of ANDs</em>. Each AND clause (minterm) corresponds to one row of the truth table where the formula is TRUE.<br>Example: (p ∧ q) ∨ (¬p ∧ r) ∨ (q ∧ ¬r)</p>
+  </div>
+  <div class="def-box logic">
+    <div class="def-label">Conjunctive Normal Form (CNF)</div>
+    <p>An <em>AND of ORs</em>. Each OR clause (maxterm) corresponds to one row where the formula is FALSE, negated.<br>Example: (p ∨ ¬q) ∧ (¬p ∨ r) ∧ (q ∨ r)</p>
+  </div>
+  <div class="demo-box logic">
+    <div class="demo-title">▶ DNF / CNF Generator</div>
+    <input class="formula-input" id="nfFormula" placeholder="e.g. p → (q ∧ r)" value="p ∧ (q ∨ r)">
+    <div class="btn-row"><button class="btn-logic" onclick="genNormalForms()">Generate DNF & CNF</button></div>
+    <div id="nfOutput" style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2;"></div>
+  </div>
+</section>
+
+<!-- §10 Circuit Design -->
+<section class="section" id="L10">
+  <div class="section-id">§10 — Circuit Design</div>
+  <h2>Logic Gates — Boolean to Hardware</h2>
+  <p>Every logical operator corresponds to a hardware gate. A <em>logic circuit</em> is a network of gates. Understanding this connection is fundamental to computer architecture.</p>
+  <div class="demo-box logic">
+    <div class="demo-title">▶ Gate Simulator — Toggle Inputs A and B</div>
+    <div style="margin-bottom:16px;display:flex;gap:16px;align-items:center;">
+      <div class="gate-in">
+        <div class="input-hint">A</div>
+        <button class="gate-toggle" id="gateA" onclick="toggleGate('A')">0</button>
+      </div>
+      <div class="gate-in">
+        <div class="input-hint">B</div>
+        <button class="gate-toggle" id="gateB" onclick="toggleGate('B')">0</button>
+      </div>
+    </div>
+    <div id="gateOutputs"></div>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+      <div class="input-hint" style="margin-bottom:8px;">Half Adder (A ⊕ B = Sum, A ∧ B = Carry)</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div><div class="input-hint">Sum</div><div class="gate-out F" id="haSum">0</div></div>
+        <div><div class="input-hint">Carry</div><div class="gate-out F" id="haCarry">0</div></div>
+      </div>
+    </div>
+    <p class="demo-caption">A half adder performs binary addition of two bits. Full adder chains multiple half adders for multi-bit arithmetic — the foundation of ALUs.</p>
+  </div>
+</section>
+
+<!-- §11 K-Map -->
+<section class="section" id="L11">
+  <div class="section-id">§11 — Karnaugh Map (K-Map)</div>
+  <h2>K-Map Minimization</h2>
+  <p>A <em>Karnaugh Map</em> is a visual tool for minimizing Boolean expressions. Adjacent cells in the K-Map differ by exactly one variable (Gray code ordering), allowing groups to be read as simplified product terms.</p>
+  <div class="math">
+  <span class="hi-logic">K-Map Rules:</span>
+  1. Groups must be rectangles of size 1, 2, 4, 8, or 16 (powers of 2)
+  2. Wrap-around is allowed (top↔bottom, left↔right)
+  3. Larger groups = fewer literals = simpler expression
+  4. Every 1-cell must be in at least one group
+  5. Find the <em>minimum cover</em> using the <em>largest</em> possible groups
+  </div>
+  <div class="demo-box logic">
+    <div class="demo-title">▶ Interactive 4-Variable K-Map</div>
+    <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:12px;">Click cells to toggle 0/1. Then click "Minimize" to see the simplified SOP expression.</p>
+    <div class="kmap-wrapper">
+      <table class="kmap-table" id="kmapTable">
+        <thead>
+          <tr><th style="background:transparent;border-color:transparent;"></th><th>CD=00</th><th>CD=01</th><th>CD=11</th><th>CD=10</th></tr>
+        </thead>
+        <tbody id="kmapBody"></tbody>
+      </table>
+    </div>
+    <div class="btn-row">
+      <button class="btn-logic" onclick="minimizeKmap()">Minimize SOP</button>
+      <button onclick="setKmapPreset([0,1,3,2,4,5,7,6])">Preset 1</button>
+      <button onclick="setKmapPreset([0,1,5,4])">Preset 2</button>
+      <button onclick="setKmapPreset([0,2,8,10])">Preset 3</button>
+      <button onclick="clearKmap()">Clear</button>
+    </div>
+    <div class="kmap-result" id="kmapResult">Click "Minimize SOP" to see the simplified expression.</div>
+    <p class="demo-caption">AB rows follow Gray code: 00 → 01 → 11 → 10. This ensures adjacent cells differ by exactly one variable. Groups wrapping around edges are valid!</p>
+  </div>
+</section>
+
+</div><!-- /content -->
+</div><!-- /tab-logic -->
+
+<!-- ═══════════════════ TAB 2: PROOFS ═══════════════════ -->
+<div class="tab-panel proofs" id="tab-proofs">
+<div class="tab-hero">
+  <div class="hero-eyebrow">● Tab II — Mathematical Proof Techniques</div>
+  <h1>The Art of<br>Mathematical Proof</h1>
+  <p>Nine proof strategies — each with a worked example, step-by-step reveal, and quiz to test your understanding. Master these and you can prove anything.</p>
+  <div class="hero-chips">
+    <span class="chip">Direct</span><span class="chip">Contrapositive</span><span class="chip">Contradiction</span>
+    <span class="chip">Cases</span><span class="chip">Existence</span><span class="chip">Uniqueness</span><span class="chip">Vacuous</span>
+  </div>
+</div>
+<div class="content">
+
+<!-- §1 Introduction -->
+<section class="section" id="P1">
+  <div class="section-id">§1 — Introduction to Proofs</div>
+  <h2>What Is a Mathematical Proof?</h2>
+  <p>A <em>proof</em> is a rigorous argument that establishes the truth of a mathematical statement beyond doubt. Every step must follow from definitions, axioms, or previously proven theorems.</p>
+  <div class="def-box proofs">
+    <div class="def-label">Structure of a Proof</div>
+    <p><strong>Theorem:</strong> A statement to be proved.<br>
+    <strong>Hypothesis / Premises:</strong> What we are given (assume true).<br>
+    <strong>Conclusion:</strong> What we must show follows from the hypothesis.<br>
+    <strong>QED / □:</strong> Marks the end of the proof ("quod erat demonstrandum").</p>
+  </div>
+  <div class="callout good">
+    <strong>Strategy checklist:</strong> Before writing a proof, ask: (1) What are you given? (2) What must you show? (3) What definitions are relevant? (4) Try small examples first. (5) Choose the appropriate method.
+  </div>
+</section>
+
+<!-- §2 Direct Proof -->
+<section class="section" id="P2">
+  <div class="section-id">§2 — Direct Proof</div>
+  <h2>Direct Proof</h2>
+  <p>The most straightforward method. To prove <strong>p → q</strong>: assume p is true, then use definitions, algebra, and known facts to derive q directly.</p>
+  <div class="def-box proofs">
+    <div class="def-label">Template</div>
+    <p>1. Assume p (the hypothesis).<br>2. Apply definitions and known facts step by step.<br>3. Conclude q.</p>
+  </div>
+  <div class="demo-box proofs">
+    <div class="demo-title">▶ Direct Proof — Step-Through</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;margin-bottom:12px;">
+      <strong style="font-family:'Cinzel',serif;font-size:.85rem;">Theorem:</strong> If n is an even integer, then n² is even.
+    </div>
+    <div class="proof-steps" id="dpSteps">
+      <div class="proof-step"><div class="step-num">Step 1 — Assume hypothesis</div><div class="step-math">Assume n is even.</div><div class="step-reason">This is what we are given.</div></div>
+      <div class="proof-step"><div class="step-num">Step 2 — Apply definition</div><div class="step-math">By definition of even: n = 2k  for some integer k.</div><div class="step-reason">Definition of even numbers.</div></div>
+      <div class="proof-step"><div class="step-num">Step 3 — Algebraic manipulation</div><div class="step-math">Then n² = (2k)² = 4k² = 2(2k²).</div><div class="step-reason">Squaring both sides, factoring.</div></div>
+      <div class="proof-step"><div class="step-num">Step 4 — Apply definition again</div><div class="step-math">Since 2k² is an integer, n² = 2(2k²) is divisible by 2.</div><div class="step-reason">Definition of even: 2 × integer.</div></div>
+      <div class="proof-step"><div class="step-num">Conclusion □</div><div class="step-math">Therefore n² is even. ∎</div><div class="step-reason">We derived the conclusion directly.</div></div>
+    </div>
+    <div class="btn-row"><button class="btn-proofs" onclick="revealSteps('dpSteps','P')">Next Step ▶</button><button onclick="resetSteps('dpSteps')">Reset</button></div>
+  </div>
+</section>
+
+<!-- §3 Contrapositive -->
+<section class="section" id="P3">
+  <div class="section-id">§3 — Contrapositive Proof</div>
+  <h2>Proof by Contrapositive</h2>
+  <p>Instead of proving <strong>p → q</strong> directly, prove the logically equivalent <strong>¬q → ¬p</strong>. Useful when working backwards from the conclusion is easier than forward from the hypothesis.</p>
+  <div class="math">
+  p → q  ≡  ¬q → ¬p   <span class="dim">(these are always logically equivalent!)</span>
+  </div>
+  <div class="demo-box proofs">
+    <div class="demo-title">▶ Contrapositive Proof — Step-Through</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;margin-bottom:12px;">
+      <strong style="font-family:'Cinzel',serif;font-size:.85rem;">Theorem:</strong> If n² is odd, then n is odd.
+    </div>
+    <div class="proof-steps" id="cpSteps">
+      <div class="proof-step"><div class="step-num">Step 1 — Identify contrapositive</div><div class="step-math">Instead prove: if n is NOT odd (even), then n² is NOT odd (even).</div><div class="step-reason">Contrapositive: ¬q → ¬p</div></div>
+      <div class="proof-step"><div class="step-num">Step 2 — Assume ¬q</div><div class="step-math">Assume n is even. So n = 2k for some integer k.</div><div class="step-reason">Starting with the negated conclusion.</div></div>
+      <div class="proof-step"><div class="step-num">Step 3 — Derive ¬p</div><div class="step-math">Then n² = (2k)² = 4k² = 2(2k²) — which is even.</div><div class="step-reason">Direct calculation.</div></div>
+      <div class="proof-step"><div class="step-num">Conclusion □</div><div class="step-math">∴ If n is even → n² is even. Equivalently: if n² is odd → n is odd. ∎</div><div class="step-reason">Contrapositive established ≡ original theorem proved.</div></div>
+    </div>
+    <div class="btn-row"><button class="btn-proofs" onclick="revealSteps('cpSteps','P')">Next Step ▶</button><button onclick="resetSteps('cpSteps')">Reset</button></div>
+  </div>
+</section>
+
+<!-- §4 Contradiction -->
+<section class="section" id="P4">
+  <div class="section-id">§4 — Proof by Contradiction</div>
+  <h2>Reductio Ad Absurdum</h2>
+  <p>Assume the <strong>negation</strong> of what you want to prove. Show this leads to a logical impossibility (contradiction). Therefore the original statement must be true.</p>
+  <div class="def-box proofs">
+    <div class="def-label">Template</div>
+    <p>1. Assume ¬p (negation of what you want to prove).<br>2. Derive a contradiction: some statement C and ¬C both hold.<br>3. Since ¬p leads to impossibility, p must be true. □</p>
+  </div>
+  <div class="demo-box proofs">
+    <div class="demo-title">▶ Classic Proof — √2 is Irrational</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;margin-bottom:12px;">
+      <strong style="font-family:'Cinzel',serif;font-size:.85rem;">Theorem:</strong> √2 is irrational (cannot be expressed as p/q with integers p, q).
+    </div>
+    <div class="proof-steps" id="contrSteps">
+      <div class="proof-step"><div class="step-num">Step 1 — Assume the negation</div><div class="step-math">Assume √2 IS rational. So √2 = p/q where p, q ∈ ℤ, q ≠ 0, and gcd(p,q) = 1 (fraction in lowest terms).</div><div class="step-reason">Setup for contradiction.</div></div>
+      <div class="proof-step"><div class="step-num">Step 2 — Algebraic manipulation</div><div class="step-math">Squaring: 2 = p²/q²  →  p² = 2q²</div><div class="step-reason">Both sides squared.</div></div>
+      <div class="proof-step"><div class="step-num">Step 3 — First consequence</div><div class="step-math">p² = 2q² means p² is even → p is even (by our previous theorem!).<br>So p = 2k for some integer k.</div><div class="step-reason">Contrapositive: n² even → n even.</div></div>
+      <div class="proof-step"><div class="step-num">Step 4 — Second consequence</div><div class="step-math">Substituting: (2k)² = 2q²  →  4k² = 2q²  →  q² = 2k²<br>So q² is even → q is even.</div><div class="step-reason">Same argument for q.</div></div>
+      <div class="proof-step"><div class="step-num">Step 5 — Contradiction! □</div><div class="step-math">Both p and q are even → gcd(p,q) ≥ 2. But we assumed gcd(p,q) = 1. Contradiction!</div><div class="step-reason">∴ Our assumption was wrong: √2 is irrational. ∎</div></div>
+    </div>
+    <div class="btn-row"><button class="btn-proofs" onclick="revealSteps('contrSteps','P')">Next Step ▶</button><button onclick="resetSteps('contrSteps')">Reset</button></div>
+  </div>
+</section>
+
+<!-- §5 Cases -->
+<section class="section" id="P5">
+  <div class="section-id">§5 — Proof by Cases</div>
+  <h2>Proof by Cases (Exhaustion)</h2>
+  <p>Divide the universe of possible inputs into <em>exhaustive, mutually exclusive cases</em>. Prove the theorem for each case. Together they cover all possibilities.</p>
+  <div class="demo-box proofs">
+    <div class="demo-title">▶ Proof by Cases — Step-Through</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;margin-bottom:12px;">
+      <strong style="font-family:'Cinzel',serif;font-size:.85rem;">Theorem:</strong> For any integer n, n² + n is even.
+    </div>
+    <div class="proof-steps" id="casesSteps">
+      <div class="proof-step"><div class="step-num">Setup</div><div class="step-math">n is an integer. Every integer is either even or odd — these cases are exhaustive and mutually exclusive.</div></div>
+      <div class="proof-step"><div class="step-num">Case 1: n is even</div><div class="step-math">n = 2k. Then n² + n = 4k² + 2k = 2(2k² + k). This is even. ✓</div><div class="step-reason">Definition of even numbers.</div></div>
+      <div class="proof-step"><div class="step-num">Case 2: n is odd</div><div class="step-math">n = 2k+1. Then n² + n = (2k+1)² + (2k+1) = 4k²+4k+1+2k+1 = 4k²+6k+2 = 2(2k²+3k+1). Even! ✓</div><div class="step-reason">Algebra + definition of even.</div></div>
+      <div class="proof-step"><div class="step-num">Conclusion □</div><div class="step-math">In both cases n² + n is even. Since every integer is even or odd, this covers all integers. ∎</div></div>
+    </div>
+    <div class="btn-row"><button class="btn-proofs" onclick="revealSteps('casesSteps','P')">Next Step ▶</button><button onclick="resetSteps('casesSteps')">Reset</button></div>
+  </div>
+</section>
+
+<!-- §6 Existence -->
+<section class="section" id="P6">
+  <div class="section-id">§6 — Existence Proof</div>
+  <h2>Existence Proofs</h2>
+  <p>To prove <strong>∃x P(x)</strong>, you must show at least one element satisfying P(x) exists.</p>
+  <div class="def-box proofs">
+    <div class="def-label">Constructive vs Non-Constructive</div>
+    <p><strong>Constructive:</strong> Explicitly exhibit the witness. "Let x = 3; then x² − 1 = 8 = 2³ ✓"<br>
+    <strong>Non-constructive:</strong> Prove existence without finding the specific witness, often via contradiction or pigeonhole.</p>
+  </div>
+  <div class="demo-box proofs">
+    <div class="demo-title">▶ Non-Constructive Existence Proof</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;margin-bottom:12px;">
+      <strong style="font-family:'Cinzel',serif;font-size:.85rem;">Theorem:</strong> There exist irrational numbers a, b such that aᵇ is rational.
+    </div>
+    <div class="proof-steps" id="existSteps">
+      <div class="proof-step"><div class="step-num">Step 1 — Consider √2^√2</div><div class="step-math">Let a = b = √2 (both irrational). Consider x = √2^√2.</div><div class="step-reason">x is either rational or irrational — two cases.</div></div>
+      <div class="proof-step"><div class="step-num">Case 1: x = √2^√2 is rational</div><div class="step-math">Then a = b = √2 are irrational and aᵇ = √2^√2 is rational. Done!</div><div class="step-reason">Witnesses found: a = b = √2.</div></div>
+      <div class="proof-step"><div class="step-num">Case 2: x = √2^√2 is irrational</div><div class="step-math">Let a = √2^√2 (irrational), b = √2 (irrational).<br>Then aᵇ = (√2^√2)^√2 = √2^(√2·√2) = √2² = 2. Rational!</div><div class="step-reason">Witnesses: a = √2^√2, b = √2.</div></div>
+      <div class="proof-step"><div class="step-num">Conclusion □</div><div class="step-math">In either case, we've found irrational a,b with aᵇ rational. ∎<br>(Note: we don't know WHICH case holds — this is non-constructive!)</div></div>
+    </div>
+    <div class="btn-row"><button class="btn-proofs" onclick="revealSteps('existSteps','P')">Next Step ▶</button><button onclick="resetSteps('existSteps')">Reset</button></div>
+  </div>
+</section>
+
+<!-- §7 Uniqueness -->
+<section class="section" id="P7">
+  <div class="section-id">§7 — Uniqueness Proof</div>
+  <h2>Uniqueness Proofs</h2>
+  <p>A uniqueness proof has two parts: (1) show the object <em>exists</em>, (2) show it is the <em>only</em> such object.</p>
+  <div class="def-box proofs">
+    <div class="def-label">Standard Template</div>
+    <p>1. <strong>Existence:</strong> Exhibit (or prove existence of) an object satisfying the property.<br>
+    2. <strong>Uniqueness:</strong> Assume two objects x and y both satisfy the property, then prove x = y.</p>
+  </div>
+  <div class="demo-box proofs">
+    <div class="demo-title">▶ Uniqueness of the Additive Identity in ℝ</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;margin-bottom:12px;">
+      <strong style="font-family:'Cinzel',serif;font-size:.85rem;">Theorem:</strong> There is a unique real number e such that e + x = x for all x ∈ ℝ.
+    </div>
+    <div class="proof-steps" id="uniqSteps">
+      <div class="proof-step"><div class="step-num">Existence</div><div class="step-math">e = 0 satisfies 0 + x = x for all x ∈ ℝ. ✓</div><div class="step-reason">Verified by arithmetic axiom.</div></div>
+      <div class="proof-step"><div class="step-num">Assume two identities exist</div><div class="step-math">Suppose e₁ and e₂ both satisfy: e₁ + x = x and e₂ + x = x for all x.</div><div class="step-reason">Uniqueness: assume two, prove they're equal.</div></div>
+      <div class="proof-step"><div class="step-num">Smart substitution</div><div class="step-math">Apply e₁'s property with x = e₂: e₁ + e₂ = e₂<br>Apply e₂'s property with x = e₁: e₂ + e₁ = e₁</div></div>
+      <div class="proof-step"><div class="step-num">Conclusion □</div><div class="step-math">Since addition is commutative: e₁ + e₂ = e₂ + e₁.<br>So e₂ = e₁. The additive identity is unique. ∎</div></div>
+    </div>
+    <div class="btn-row"><button class="btn-proofs" onclick="revealSteps('uniqSteps','P')">Next Step ▶</button><button onclick="resetSteps('uniqSteps')">Reset</button></div>
+  </div>
+</section>
+
+<!-- §8 Vacuous Proof -->
+<section class="section" id="P8">
+  <div class="section-id">§8 — Vacuous Proof</div>
+  <h2>Vacuous and Trivial Proofs</h2>
+  <div class="def-box proofs">
+    <div class="def-label">Vacuous Proof</div>
+    <p>To prove <strong>p → q</strong>: if you can show p is FALSE, then p → q is TRUE regardless of q. (A false premise implies anything.)</p>
+  </div>
+  <div class="def-box proofs">
+    <div class="def-label">Trivial Proof</div>
+    <p>To prove <strong>p → q</strong>: if you can show q is TRUE, then p → q is TRUE regardless of p. (An always-true conclusion makes any implication true.)</p>
+  </div>
+  <div class="callout warn">
+    <strong>Vacuous Example:</strong> "All integers in the set {1, 2, 3} that are greater than 100 are prime." Since NO integer in {1,2,3} is > 100, the universal statement is vacuously true — there are no counterexamples.
+  </div>
+  <div class="demo-box proofs">
+    <div class="demo-title">▶ Quiz — Identify the Proof Type</div>
+    <div data-quiz="2">
+      <p style="margin-bottom:10px;font-size:.92rem;">"Prove: If 2 + 2 = 5, then the moon is made of cheese."</p>
+      <button class="quiz-option" data-correct="false">Direct Proof — just show the moon is cheese.</button>
+      <button class="quiz-option" data-correct="true">Vacuous Proof — the premise "2+2=5" is FALSE, so the implication is trivially TRUE.</button>
+      <button class="quiz-option" data-correct="false">Contradiction Proof — assume the moon isn't cheese.</button>
+      <div class="quiz-explain">✓ Since "2+2=5" is false, ANY statement follows from it — this is vacuously true. This is why a false hypothesis "proves" everything: logical implication only fails when p is TRUE and q is FALSE.</div>
+    </div>
+  </div>
+</section>
+
+<!-- §9 Strategy Guide -->
+<section class="section" id="P9">
+  <div class="section-id">§9 — Proof Strategy Guide</div>
+  <h2>Choosing the Right Method</h2>
+  <div class="fc-grid">
+    <div class="fc"><div class="fc-q"><div class="fc-qt">When should I use Direct Proof?</div><div class="fc-tog">↓</div></div><div class="fc-a">When the hypothesis directly gives you enough information to algebraically or logically derive the conclusion. Start by writing "Assume p..." and see if you can reach q by applying definitions and known theorems.</div></div>
+    <div class="fc"><div class="fc-q"><div class="fc-qt">When should I use Contrapositive?</div><div class="fc-tog">↓</div></div><div class="fc-a">When the direct approach gets stuck, or when the negated conclusion gives more useful structure. Common signal: the conclusion is an existential ("there exists...") and the negation is a universal.</div></div>
+    <div class="fc"><div class="fc-q"><div class="fc-qt">When should I use Contradiction?</div><div class="fc-tog">↓</div></div><div class="fc-a">Ideal for proving something is IMPOSSIBLE or for showing uniqueness/non-existence. Classic uses: irrationality of √2, infinitely many primes, pigeonhole arguments. Assume the opposite, then find two contradictory facts.</div></div>
+    <div class="fc"><div class="fc-q"><div class="fc-qt">When should I use Cases?</div><div class="fc-tog">↓</div></div><div class="fc-a">When the domain naturally splits (even/odd, positive/negative/zero, or finitely many sub-cases). Make sure your cases are: (1) exhaustive — they cover everything, and (2) mutually exclusive — no overlap.</div></div>
+    <div class="fc"><div class="fc-q"><div class="fc-qt">What's the most common beginner mistake?</div><div class="fc-tog">↓</div></div><div class="fc-a">Assuming what you're trying to prove (circular reasoning). Also common: confusing the direction of a proof (proving p → q by assuming both p AND q). Always state clearly what you assume and what you're trying to show.</div></div>
+  </div>
+</section>
+
+</div></div><!-- /tab-proofs -->
+
+<!-- ═══════════════════ TAB 3: SETS ═══════════════════ -->
+<div class="tab-panel sets" id="tab-sets">
+<div class="tab-hero">
+  <div class="hero-eyebrow">● Tab III — Set Theory</div>
+  <h1>The Foundation of<br>Mathematics</h1>
+  <p>Sets underlie all of mathematics. From basic operations to Russell's Paradox and Cantor's shocking proof that infinities come in different sizes.</p>
+  <div class="hero-chips">
+    <span class="chip">Notation</span><span class="chip">Operations</span><span class="chip">Cardinality</span>
+    <span class="chip">Russell's Paradox</span><span class="chip">Countability</span><span class="chip">Cantor's Diagonal</span>
+  </div>
+</div>
+<div class="content">
+
+<!-- §1 Introduction -->
+<section class="section" id="S1">
+  <div class="section-id">§1 — Introduction to Sets</div>
+  <h2>Sets — Collections of Distinct Objects</h2>
+  <p>A <em>set</em> is an unordered collection of distinct objects called <em>elements</em>. Sets are fundamental — numbers, functions, relations, graphs are all defined in terms of sets.</p>
+  <div class="math">
+  <span class="hi-sets">Roster Notation:</span>  A = {1, 2, 3, 4}     <span class="dim">explicit list</span>
+  <span class="hi-sets">Set-Builder:</span>       B = {x | x ∈ ℤ, x > 0}  <span class="dim">all positive integers</span>
+  <span class="hi-sets">Membership:</span>        3 ∈ A  (true)     7 ∈ A  (false, write 7 ∉ A)
+  <span class="hi-sets">Special sets:</span>
+    ∅ = {} (empty set)     ℕ = {0,1,2,...}     ℤ = {...,-1,0,1,...}
+    ℚ = {p/q | p,q ∈ ℤ, q≠0}      ℝ = all real numbers
+  </div>
+  <div class="def-box sets">
+    <div class="def-label">Key Distinctions</div>
+    <p><strong>Order doesn't matter:</strong> {1,2,3} = {3,1,2} = {2,3,1}<br>
+    <strong>No duplicates:</strong> {1,1,2,3} = {1,2,3}<br>
+    <strong>∅ ≠ {∅}:</strong> The empty set is not the same as the set containing the empty set!</p>
+  </div>
+  <div class="demo-box sets">
+    <div class="demo-title">▶ Subset & Power Set</div>
+    <p style="font-size:.87rem;color:var(--text-dim);margin-bottom:10px;">A ⊆ B iff every element of A is in B. The power set P(A) contains all subsets. If |A|=n, then |P(A)|=2ⁿ.</p>
+    <input class="formula-input sets" id="psInput" placeholder="Enter a set, e.g.  {1, 2, 3}" value="{1, 2, 3}">
+    <div class="btn-row"><button class="btn-sets" onclick="computePowerSet()">Compute Power Set P(A)</button></div>
+    <div id="psOutput" style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2;color:var(--text-dim);"></div>
+  </div>
+</section>
+
+<!-- §2 Set Operations -->
+<section class="section" id="S2">
+  <div class="section-id">§2 — Set Operations</div>
+  <h2>Set Operations & Venn Diagrams</h2>
+  <p>Sets can be combined and compared using a rich algebra. Every operation has a clear visual interpretation in a Venn diagram.</p>
+  <div class="set-ops" id="setOpCards">
+    <div class="set-op-card sel" data-sop="union"><div class="set-op-sym">A ∪ B</div><div class="set-op-name">Union</div><div class="set-op-def">{x | x∈A or x∈B}</div></div>
+    <div class="set-op-card" data-sop="intersection"><div class="set-op-sym">A ∩ B</div><div class="set-op-name">Intersection</div><div class="set-op-def">{x | x∈A and x∈B}</div></div>
+    <div class="set-op-card" data-sop="a_minus_b"><div class="set-op-sym">A − B</div><div class="set-op-name">Difference</div><div class="set-op-def">{x | x∈A and x∉B}</div></div>
+    <div class="set-op-card" data-sop="sym_diff"><div class="set-op-sym">A ⊕ B</div><div class="set-op-name">Symmetric Diff</div><div class="set-op-def">{x | x∈A XOR x∈B}</div></div>
+    <div class="set-op-card" data-sop="complement_a"><div class="set-op-sym">Aᶜ</div><div class="set-op-name">Complement</div><div class="set-op-def">{x | x∈U and x∉A}</div></div>
+    <div class="set-op-card" data-sop="b_minus_a"><div class="set-op-sym">B − A</div><div class="set-op-name">Difference (B−A)</div><div class="set-op-def">{x | x∈B and x∉A}</div></div>
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-top:14px;">
+    <canvas id="vennCanvas" width="340" height="220"></canvas>
+    <div style="flex:1;min-width:200px;">
+      <div id="vennDesc" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 14px;line-height:1.9;"></div>
+      <div style="margin-top:12px;font-size:.85rem;color:var(--text-dim);">Example with A = {1,2,3,4,5}, B = {3,4,5,6,7}:</div>
+      <div id="vennExample" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sets);margin-top:6px;line-height:1.8;"></div>
+    </div>
+  </div>
+  <div class="callout note" style="margin-top:16px;">
+    <strong>De Morgan's Laws for Sets:</strong> (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ &nbsp;&nbsp; | &nbsp;&nbsp; (A ∩ B)ᶜ = Aᶜ ∪ Bᶜ<br>
+    <span style="font-size:.85rem;">These mirror De Morgan's logical laws — duality between ∪/∨ and ∩/∧.</span>
+  </div>
+</section>
+
+<!-- §3 Cardinality -->
+<section class="section" id="S3">
+  <div class="section-id">§3 — Cardinality</div>
+  <h2>Cardinality — Measuring the Size of Sets</h2>
+  <p>The <em>cardinality</em> |A| is the "number of elements" in A. For finite sets this is straightforward. For infinite sets, we define it via bijections — a profound and surprising idea.</p>
+  <div class="def-box sets">
+    <div class="def-label">Definition (Equinumerosity)</div>
+    <p>Two sets A and B have the same cardinality (<strong>|A| = |B|</strong>) iff there exists a <em>bijection</em> (one-to-one correspondence) f: A → B. This definition works even for infinite sets!</p>
+  </div>
+  <div class="math">
+  <span class="hi-sets">Finite:</span>      |{a, b, c}| = 3
+
+  <span class="hi-sets">Infinite:</span>    |ℕ| = |{2n | n ∈ ℕ}|  ← same size as all even numbers!
+  Bijection: n ↦ 2n   <span class="dim">(maps every natural to a unique even)</span>
+
+  <span class="hi-sets">|ℕ| = |ℤ| = |ℚ| = ℵ₀</span>  (countably infinite)
+  <span class="hi-sets">|ℝ| = 𝔠 > ℵ₀</span>             (uncountably infinite — proved below!)
+  </div>
+</section>
+
+<!-- §4 Russell's Paradox -->
+<section class="section" id="S4">
+  <div class="section-id">§4 — Russell's Paradox</div>
+  <h2>Russell's Paradox — Naive Set Theory Breaks</h2>
+  <p>Bertrand Russell (1901) discovered a devastating contradiction in <em>naive set theory</em> (which allows any description to define a set).</p>
+  <div class="demo-box sets">
+    <div class="demo-title">▶ The Paradox — Step Through It</div>
+    <div class="proof-steps" id="russellSteps">
+      <div class="proof-step"><div class="step-num">The Setup</div><div class="step-math">Define R = {x | x ∉ x}. The "set of all sets that do not contain themselves."</div><div class="step-reason">Naive set theory: any predicate defines a set.</div></div>
+      <div class="proof-step"><div class="step-num">The Question</div><div class="step-math">Does R ∈ R? (Is R a member of itself?)</div><div class="step-reason">Let's find out...</div></div>
+      <div class="proof-step"><div class="step-num">Case 1: Suppose R ∈ R</div><div class="step-math">Then R satisfies the membership condition: R ∉ R. But we assumed R ∈ R. Contradiction!</div><div class="step-reason">R ∈ R  →  R ∉ R. ✗</div></div>
+      <div class="proof-step"><div class="step-num">Case 2: Suppose R ∉ R</div><div class="step-math">Then R satisfies x ∉ x, so R should be IN R. But we assumed R ∉ R. Contradiction!</div><div class="step-reason">R ∉ R  →  R ∈ R. ✗</div></div>
+      <div class="proof-step"><div class="step-num">Conclusion — Naive Set Theory is Broken!</div><div class="step-math">R ∈ R ↔ R ∉ R. No consistent truth value exists! Naive set theory is contradictory.</div><div class="step-reason">Resolution: ZFC Axiomatic Set Theory restricts which collections can be called "sets."</div></div>
+    </div>
+    <div class="btn-row"><button class="btn-sets" onclick="revealSteps('russellSteps','S')">Next Step ▶</button><button onclick="resetSteps('russellSteps')">Reset</button></div>
+  </div>
+  <div class="callout note">
+    <strong>The Barber Paradox</strong> (Russell's popular version): "In a town, the barber shaves all and only those who do not shave themselves. Who shaves the barber?" — The same logical structure. The resolution: no such barber can exist.
+  </div>
+</section>
+
+<!-- §5 Countability -->
+<section class="section" id="S5">
+  <div class="section-id">§5 — Countability</div>
+  <h2>Countable and Uncountable Sets</h2>
+  <p>A set is <em>countable</em> if it can be put in bijection with ℕ (or is finite). Cantor's shocking result: not all infinite sets have the same size.</p>
+  <div class="count-chart">
+    <div class="count-set"><div class="count-sym">ℕ</div><div class="count-name">Natural Numbers</div><div class="count-badge count-yes">Countably ∞</div></div>
+    <div class="count-set"><div class="count-sym">𝕎</div><div class="count-name">Whole Numbers</div><div class="count-badge count-yes">Countably ∞</div></div>
+    <div class="count-set"><div class="count-sym">ℤ</div><div class="count-name">Integers</div><div class="count-badge count-yes">Countably ∞</div></div>
+    <div class="count-set"><div class="count-sym">ℚ</div><div class="count-name">Rationals</div><div class="count-badge count-yes">Countably ∞</div></div>
+    <div class="count-set"><div class="count-sym">ℝ</div><div class="count-name">Reals</div><div class="count-badge count-no">UNCOUNTABLE</div></div>
+    <div class="count-set"><div class="count-sym">ℂ</div><div class="count-name">Complex</div><div class="count-badge count-no">UNCOUNTABLE</div></div>
+  </div>
+  <div class="math">
+  <span class="hi-sets">ℤ is countable — bijection with ℕ:</span>
+  ℕ: 0  1   2   3   4   5   6   7  ...
+  ℤ: 0  1  -1   2  -2   3  -3   4  ...  (interleave positives and negatives)
+
+  <span class="hi-sets">ℚ is countable — Cantor's zig-zag:</span>
+  Arrange all p/q in a 2D grid, traverse diagonally, skip duplicates.
+  Every rational appears exactly once → bijection with ℕ. ✓
+  </div>
+</section>
+
+<!-- §6 Cantor's Diagonalization -->
+<section class="section" id="S6">
+  <div class="section-id">§6 — Cantor's Diagonalization</div>
+  <h2>Cantor's Diagonal Argument</h2>
+  <p>Cantor's 1891 proof that ℝ is uncountable is one of the most elegant arguments in mathematics. It proves that <em>no enumeration of real numbers can be complete</em> — always missing infinitely many.</p>
+  <div class="demo-box sets">
+    <div class="demo-title">▶ Diagonal Argument — Animated</div>
+    <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:12px;">We represent real numbers in (0,1) as infinite binary sequences. Watch the argument unfold.</p>
+    <div id="cantorGrid"></div>
+    <div id="cantorExplanation" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 14px;margin-top:10px;min-height:40px;line-height:1.8;"></div>
+    <div class="btn-row">
+      <button class="btn-sets" id="cantorBtn">▶ Start Animation</button>
+      <button id="cantorResetBtn">Reset</button>
+    </div>
+    <p class="demo-caption">The key insight: the diagonal sequence, once flipped, differs from every row in at least one position. So it cannot be in any enumeration — no list can contain all reals.</p>
+  </div>
+  <div class="proof-steps" id="cantorProof">
+    <div class="proof-step revealed"><div class="step-num">Step 1 — Assume for contradiction</div><div class="step-math">Suppose ℝ ∩ (0,1) is countable. Then we can list ALL binary sequences: r₁, r₂, r₃, ...</div></div>
+    <div class="proof-step revealed"><div class="step-num">Step 2 — Extract the diagonal</div><div class="step-math">Let dₙ = the n-th bit of rₙ (the diagonal). Form sequence d = d₁d₂d₃...</div></div>
+    <div class="proof-step revealed"><div class="step-num">Step 3 — Flip each diagonal bit</div><div class="step-math">Define s where sₙ = 1 if dₙ = 0, and sₙ = 0 if dₙ = 1. So s differs from d in every position.</div></div>
+    <div class="proof-step revealed"><div class="step-num">Step 4 — The key observation</div><div class="step-math">s ≠ r₁ (differs in position 1).<br>s ≠ r₂ (differs in position 2).<br>s ≠ rₙ for ALL n (differs in position n).</div></div>
+    <div class="proof-step revealed"><div class="step-num">Contradiction □</div><div class="step-math">s ∈ (0,1) but s is NOT in our list — contradicting the assumption that the list was complete. Therefore ℝ is uncountable. ∎</div></div>
+  </div>
+</section>
+
+</div></div><!-- /tab-sets -->
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+/* ── UTILS ── */
+const qs = (s, p=document) => p.querySelector(s);
+const qsa = (s, p=document) => [...p.querySelectorAll(s)];
+
+/* ── TABS ── */
+const tabs = { logic: 'Logic', proofs: 'Proofs', sets: 'Sets' };
+const tocMap = {
+  logic: [{id:'L1',t:'Propositions'},{id:'L2',t:'Operators'},{id:'L3',t:'Truth Tables'},{id:'L4',t:'Equivalence'},{id:'L5',t:'Predicates'},{id:'L6',t:'Quantifiers'},{id:'L7',t:'Nested ∀∃'},{id:'L8',t:'Inference'},{id:'L9',t:'Normal Forms'},{id:'L10',t:'Circuits'},{id:'L11',t:'K-Map'}],
+  proofs: [{id:'P1',t:'Intro'},{id:'P2',t:'Direct'},{id:'P3',t:'Contrapositive'},{id:'P4',t:'Contradiction'},{id:'P5',t:'Cases'},{id:'P6',t:'Existence'},{id:'P7',t:'Uniqueness'},{id:'P8',t:'Vacuous'},{id:'P9',t:'Strategy'}],
+  sets: [{id:'S1',t:'Introduction'},{id:'S2',t:'Operations'},{id:'S3',t:'Cardinality'},{id:'S4',t:"Russell's"},{id:'S5',t:'Countability'},{id:'S6',t:"Cantor's"}]
+};
+
+let currentTab = 'logic';
+function switchTab(name) {
+  currentTab = name;
+  qsa('.tab-panel').forEach(p => p.classList.remove('active'));
+  qs('#tab-'+name).classList.add('active');
+  qsa('.tab-btn').forEach(b => { b.classList.remove('active-logic','active-proofs','active-sets'); });
+  qs(`[data-tab="${name}"]`).classList.add('active-'+name);
+  buildTOC(name);
+}
+function buildTOC(name) {
+  const strip = qs('#tocStrip');
+  strip.innerHTML = '';
+  (tocMap[name]||[]).forEach(item => {
+    const a = document.createElement('a');
+    a.className = 'toc-pill';
+    a.href = '#'+item.id;
+    a.textContent = item.t;
+    a.addEventListener('click', e => { e.preventDefault(); qs('#'+item.id)?.scrollIntoView({behavior:'smooth',block:'start'}); });
+    strip.appendChild(a);
+  });
+}
+qsa('.tab-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+buildTOC('logic');
+
+/* ── FORMULA PARSER ── */
+function normFormula(f) {
+  return f.replace(/\s+/g,'')
+    .replace(/~/g,'¬').replace(/!/g,'¬')
+    .replace(/<->/g,'↔').replace(/==/g,'↔').replace(/iff/gi,'↔')
+    .replace(/->/g,'→').replace(/implies/gi,'→')
+    .replace(/&&?/g,'∧').replace(/\bAND\b/gi,'∧')
+    .replace(/\|\|?/g,'∨').replace(/\bOR\b/gi,'∨')
+    .replace(/\^/g,'⊕').replace(/\bXOR\b/gi,'⊕');
+}
+function getVars(f) { const s=new Set(); for(const c of f) if(/[a-z]/.test(c)) s.add(c); return [...s].sort(); }
+
+class LP {
+  constructor(src,env){this.s=src;this.i=0;this.env=env;}
+  p(){return this.s[this.i];}
+  adv(){return this.s[this.i++];}
+  parse(){return this.iff();}
+  iff(){let l=this.impl();while(this.i<this.s.length&&this.s[this.i]==='↔'){this.i++;l=(l===this.impl());}return l;}
+  impl(){let l=this.or();if(this.i<this.s.length&&this.s[this.i]==='→'){this.i++;let r=this.impl();l=(!l||r);}return l;}
+  or(){let l=this.and();while(this.i<this.s.length&&this.s[this.i]==='∨'){this.i++;l=l||this.and();}return l;}
+  and(){let l=this.xor();while(this.i<this.s.length&&this.s[this.i]==='∧'){this.i++;l=l&&this.xor();}return l;}
+  xor(){let l=this.not();while(this.i<this.s.length&&this.s[this.i]==='⊕'){this.i++;l=l!==this.not();}return l;}
+  not(){if(this.p()==='¬'){this.i++;return!this.not();}return this.atom();}
+  atom(){
+    const c=this.p();
+    if(c==='('){this.i++;const v=this.iff();if(this.p()===')')this.i++;return v;}
+    if(c==='T'||c==='⊤'){this.i++;return true;}
+    if(c==='F'||c==='⊥'){this.i++;return false;}
+    if(c==='1'){this.i++;return true;}
+    if(c==='0'){this.i++;return false;}
+    if(/[a-z]/.test(c)){let v='';while(this.i<this.s.length&&/[a-z]/.test(this.s[this.i]))v+=this.s[this.i++];if(v in this.env)return this.env[v];throw new Error('Unknown var: '+v);}
+    throw new Error('Unexpected: '+c);
+  }
+}
+
+function evalF(formula, env){ return new LP(normFormula(formula), env).parse(); }
+
+function truthTable(formula) {
+  const norm = normFormula(formula);
+  const vars = getVars(norm);
+  if(vars.length > 4) throw new Error('Max 4 variables');
+  const rows = [];
+  const n = vars.length || 0;
+  for(let i=0;i<Math.max(1,(1<<n));i++){
+    const env={};
+    vars.forEach((v,j)=>env[v]=Boolean(i>>(n-1-j)&1));
+    try{ rows.push({env,result:new LP(norm,env).parse()}); }
+    catch(e){ throw new Error('Parse: '+e.message); }
+  }
+  return {vars,rows};
+}
+
+/* ── TRUTH TABLE BUILDER ── */
+let ttInputEl = null;
+function insertSym(s){ const el=qs('#ttFormula'); el.focus(); const pos=el.selectionStart; el.value=el.value.slice(0,pos)+s+el.value.slice(el.selectionEnd); el.setSelectionRange(pos+s.length,pos+s.length); }
+function buildTruthTable(){
+  const formula = qs('#ttFormula').value;
+  const out = qs('#ttOutput');
+  const badge = qs('#satBadge');
+  try {
+    const {vars,rows} = truthTable(formula);
+    const norm = normFormula(formula);
+    let html = '<table class="truth-table"><thead><tr>';
+    vars.forEach(v => html += `<th>${v}</th>`);
+    html += `<th>${formula}</th></tr></thead><tbody>`;
+    let allT=true, allF=true;
+    rows.forEach(row => {
+      html += '<tr>';
+      vars.forEach(v => html += `<td class="${row.env[v]?'val-T':'val-F'}">${row.env[v]?'T':'F'}</td>`);
+      const r = row.result;
+      if(r) allF=false; else allT=false;
+      html += `<td class="${r?'val-T result-T':'val-F result-F'}">${r?'T':'F'}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    out.innerHTML = html;
+    if(allT) badge.innerHTML = '<span class="sat-badge sat-tautology">✓ Tautology — Always TRUE</span>';
+    else if(allF) badge.innerHTML = '<span class="sat-badge sat-contradiction">✗ Contradiction — Always FALSE</span>';
+    else badge.innerHTML = '<span class="sat-badge sat-contingency">◈ Contingency — Sometimes true</span>';
+  } catch(e) { out.innerHTML = `<span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">Error: ${e.message}</span>`; badge.innerHTML=''; }
+}
+function loadExample(type){ if(type==='tt'){ qs('#ttFormula').value='(p ∧ q) → p'; buildTruthTable(); } }
+buildTruthTable();
+
+/* ── EQUIVALENCE CHECKER ── */
+function checkEquiv(){
+  const f1=qs('#eqF1').value, f2=qs('#eqF2').value;
+  const out=qs('#eqResult');
+  try {
+    const vars = [...new Set([...getVars(normFormula(f1)),...getVars(normFormula(f2))])].sort();
+    if(vars.length>4){out.innerHTML='<span style="color:var(--red)">Max 4 variables</span>';return;}
+    const n=vars.length;
+    let equiv=true;
+    for(let i=0;i<(1<<n);i++){
+      const env={};
+      vars.forEach((v,j)=>env[v]=Boolean(i>>(n-1-j)&1));
+      if(evalF(f1,env)!==evalF(f2,env)){equiv=false;break;}
+    }
+    if(equiv) out.innerHTML=`<span style="color:var(--green)">✓  <strong>${f1}</strong>  ≡  <strong>${f2}</strong>  — Logically Equivalent!</span>`;
+    else out.innerHTML=`<span style="color:var(--red)">✗  NOT equivalent — they differ for some assignment.</span>`;
+  } catch(e){ out.innerHTML=`<span style="color:var(--red)">Error: ${e.message}</span>`; }
+}
+
+/* ── OPERATOR DETAIL ── */
+const opDetails = {
+  not: { table: [['T','F'],['F','T']], headers:['p','¬p'] },
+  and: { table: [['T','T','T'],['T','F','F'],['F','T','F'],['F','F','F']], headers:['p','q','p∧q'] },
+  or: { table: [['T','T','T'],['T','F','T'],['F','T','T'],['F','F','F']], headers:['p','q','p∨q'] },
+  implies: { table: [['T','T','T'],['T','F','F'],['F','T','T'],['F','F','T']], headers:['p','q','p→q'] },
+  iff: { table: [['T','T','T'],['T','F','F'],['F','T','F'],['F','F','T']], headers:['p','q','p↔q'] },
+  xor: { table: [['T','T','F'],['T','F','T'],['F','T','T'],['F','F','F']], headers:['p','q','p⊕q'] }
+};
+qsa('#opGrid .op-card').forEach(card => {
+  card.addEventListener('click', () => {
+    qsa('#opGrid .op-card').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    const op = card.dataset.op;
+    const d = opDetails[op];
+    const det = qs('#opDetail');
+    det.style.display='block';
+    let html=`<div class="demo-box logic"><div class="demo-title">▶ Truth Table: ${card.querySelector('.op-symbol').textContent} (${card.querySelector('.op-name').textContent})</div><table class="truth-table"><thead><tr>${d.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+    d.table.forEach(row=>{
+      html+=`<tr>`;
+      row.forEach((v,i)=>{ const isLast=i===row.length-1; html+=`<td class="${v==='T'?(isLast?'val-T result-T':'val-T'):(isLast?'val-F result-F':'val-F')}">${v}</td>`; });
+      html+=`</tr>`;
+    });
+    html+=`</tbody></table></div>`;
+    det.innerHTML=html;
+  });
+});
+
+/* ── QUANTIFIER VISUALIZER ── */
+const predicates = {
+  even: x => x%2===0,
+  gt3: x => x>3,
+  prime: x => { if(x<2)return false; for(let i=2;i<=Math.sqrt(x);i++)if(x%i===0)return false; return true; },
+  pos: x => x>0,
+  square: x => { const s=Math.round(Math.sqrt(x)); return s*s===x && x>0; },
+  div3: x => x%3===0
+};
+function updateQuantViz(){
+  const domainStr = qs('#qDomain').value;
+  const predKey = qs('#qPred').value;
+  const domain = domainStr.split(',').map(Number);
+  const pred = predicates[predKey];
+  const grid = qs('#domainGrid');
+  grid.innerHTML='';
+  let allTrue=true, someTrue=false;
+  domain.forEach(x=>{
+    const el=document.createElement('div');
+    el.className='domain-el';
+    el.textContent=x;
+    const sat = pred(x);
+    if(sat){el.classList.add('satisfied');someTrue=true;} else {el.classList.add('unsatisfied');allTrue=false;}
+    grid.appendChild(el);
+  });
+  const u=qs('#univResult'), e=qs('#existResult');
+  u.textContent=`∀x P(x) = ${allTrue?'TRUE':'FALSE'}`;
+  u.className=`quant-result ${allTrue?'quant-T':'quant-F'}`;
+  e.textContent=`∃x P(x) = ${someTrue?'TRUE':'FALSE'}`;
+  e.className=`quant-result ${someTrue?'quant-T':'quant-F'}`;
+}
+qs('#qDomain').addEventListener('change',updateQuantViz);
+qs('#qPred').addEventListener('change',updateQuantViz);
+updateQuantViz();
+
+/* ── MODUS PONENS REVEAL ── */
+let mpIdx=0;
+function initMPSteps(){ qsa('#mpSteps .proof-step').forEach((s,i)=>{ s.classList.toggle('revealed',i===0); }); mpIdx=0; }
+qs('#mpRevealBtn').addEventListener('click',()=>{
+  const steps=qsa('#mpSteps .proof-step');
+  if(mpIdx<steps.length-1){mpIdx++;steps[mpIdx].classList.add('revealed');}
+  if(mpIdx>=steps.length-1) qs('#mpRevealBtn').textContent='✓ Done';
+});
+qs('#mpResetBtn').addEventListener('click',()=>{ initMPSteps(); qs('#mpRevealBtn').textContent='Reveal Steps One by One'; });
+initMPSteps();
+
+/* ── NORMAL FORMS ── */
+function genNormalForms(){
+  const formula=qs('#nfFormula').value;
+  const out=qs('#nfOutput');
+  try{
+    const {vars,rows}=truthTable(formula);
+    const minterms=rows.filter(r=>r.result).map(r=>r.env);
+    const maxterms=rows.filter(r=>!r.result).map(r=>r.env);
+
+    function mkMinterm(env){ return '('+vars.map(v=>env[v]?v:'¬'+v).join(' ∧ ')+')'; }
+    function mkMaxterm(env){ return '('+vars.map(v=>env[v]?'¬'+v:v).join(' ∨ ')+')'; }
+
+    let html='';
+    if(minterms.length===0) html+='<div style="color:var(--red)">DNF: ⊥ (Contradiction)</div>';
+    else if(minterms.length===rows.length) html+='<div style="color:var(--green)">DNF: ⊤ (Tautology)</div>';
+    else html+=`<div><span style="color:var(--logic)">DNF:</span> <span style="color:var(--blue)">${minterms.map(mkMinterm).join(' ∨ ')}</span></div>`;
+
+    if(maxterms.length===0) html+='<div style="color:var(--green);margin-top:6px">CNF: ⊤ (Tautology)</div>';
+    else if(maxterms.length===rows.length) html+='<div style="color:var(--red);margin-top:6px">CNF: ⊥ (Contradiction)</div>';
+    else html+=`<div style="margin-top:6px"><span style="color:var(--logic)">CNF:</span> <span style="color:var(--blue)">${maxterms.map(mkMaxterm).join(' ∧ ')}</span></div>`;
+
+    out.innerHTML=html;
+  }catch(e){out.innerHTML=`<span style="color:var(--red)">Error: ${e.message}</span>`;}
+}
+
+/* ── GATE SIMULATOR ── */
+let gateVals={A:0,B:0};
+const gateConfigs=[
+  {sym:'∧',name:'AND',fn:(a,b)=>a&&b},
+  {sym:'∨',name:'OR',fn:(a,b)=>a||b},
+  {sym:'¬',name:'NOT A',fn:(a,b)=>!a},
+  {sym:'⊕',name:'XOR',fn:(a,b)=>a!==b},
+  {sym:'↑',name:'NAND',fn:(a,b)=>!(a&&b)},
+  {sym:'↓',name:'NOR',fn:(a,b)=>!(a||b)},
+];
+function toggleGate(g){ gateVals[g]=gateVals[g]?0:1; const btn=qs('#gate'+g); btn.textContent=gateVals[g]; btn.classList.toggle('on',!!gateVals[g]); updateGates(); }
+function updateGates(){
+  const a=!!gateVals.A, b=!!gateVals.B;
+  const out=qs('#gateOutputs');
+  let html='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+  gateConfigs.forEach(g=>{
+    const res=g.fn(a,b)?1:0;
+    html+=`<div style="text-align:center;min-width:70px"><div class="input-hint">${g.name}</div><div style="display:flex;align-items:center;gap:6px;margin-top:4px"><div class="gate-box">${g.sym}</div><div class="gate-out ${res?'T':'F'}">${res}</div></div></div>`;
+  });
+  html+='</div>';
+  out.innerHTML=html;
+  const sum=(a!==b)?1:0, carry=(a&&b)?1:0;
+  qs('#haSum').textContent=sum; qs('#haSum').className=`gate-out ${sum?'T':'F'}`;
+  qs('#haCarry').textContent=carry; qs('#haCarry').className=`gate-out ${carry?'T':'F'}`;
+}
+updateGates();
+
+/* ── K-MAP ── */
+const KROW=[0,1,3,2], KCOL=[0,1,3,2]; // Gray code for AB and CD
+let kmapVals=new Array(16).fill(0);
+function rcToMinterm(r,c){return(KROW[r]<<2)|KCOL[c];}
+function mintermToRC(m){const ab=m>>2,cd=m&3;return{r:KROW.indexOf(ab),c:KCOL.indexOf(cd)};}
+
+function buildKmapTable(){
+  const tbody=qs('#kmapBody');
+  tbody.innerHTML='';
+  const rowLabels=['AB=00','AB=01','AB=11','AB=10'];
+  for(let r=0;r<4;r++){
+    const tr=document.createElement('tr');
+    const th=document.createElement('th');
+    th.textContent=rowLabels[r];th.style.fontSize='10px';
+    tr.appendChild(th);
+    for(let c=0;c<4;c++){
+      const m=rcToMinterm(r,c);
+      const td=document.createElement('td');
+      td.style.padding='0';
+      const cell=document.createElement('div');
+      cell.className=`kmap-cell ${kmapVals[m]?'val1 active':'val0'}`;
+      cell.dataset.m=m;
+      cell.innerHTML=`<span class="minterm">${m}</span><span class="val">${kmapVals[m]}</span>`;
+      cell.addEventListener('click',()=>{
+        kmapVals[m]^=1;
+        cell.className=`kmap-cell ${kmapVals[m]?'val1 active':'val0'}`;
+        cell.querySelector('.val').textContent=kmapVals[m];
+      });
+      td.appendChild(cell);tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+}
+
+function setKmapPreset(ones){
+  kmapVals=new Array(16).fill(0);
+  ones.forEach(m=>kmapVals[m]=1);
+  buildKmapTable();
+  minimizeKmap();
+}
+function clearKmap(){kmapVals=new Array(16).fill(0);buildKmapTable();qs('#kmapResult').textContent='Click "Minimize SOP" to see the simplified expression.';}
+
+function groupExpr(minterms){
+  const names=['A','B','C','D'];
+  const terms=[];
+  for(let bit=3;bit>=0;bit--){
+    const varName=names[3-bit];
+    const allOne=minterms.every(m=>(m>>bit)&1);
+    const allZero=minterms.every(m=>!((m>>bit)&1));
+    if(allOne)terms.push(varName);
+    else if(allZero)terms.push(varName+"'");
+  }
+  return terms.length?terms.join(''):'1';
+}
+
+function getAllGroups(ones){
+  const oSet=new Set(ones);
+  const groups=[];
+  const seen=new Set();
+  for(let rS=0;rS<4;rS++)for(let cS=0;cS<4;cS++)for(let rN=1;rN<=4;rN*=2)for(let cN=1;cN<=4;cN*=2){
+    const cells=[];
+    for(let dr=0;dr<rN;dr++)for(let dc=0;dc<cN;dc++)cells.push(rcToMinterm((rS+dr)%4,(cS+dc)%4));
+    if(!cells.every(m=>oSet.has(m)))continue;
+    const key=[...cells].sort().join(',');
+    if(seen.has(key))continue;
+    seen.add(key);
+    groups.push({minterms:cells,expr:groupExpr(cells)});
+  }
+  return groups;
+}
+
+function minimizeKmap(){
+  const ones=kmapVals.map((v,i)=>v?i:-1).filter(i=>i>=0);
+  if(!ones.length){qs('#kmapResult').textContent='f = 0 (Always False)';clearGroupColors();return;}
+  if(ones.length===16){qs('#kmapResult').textContent='f = 1 (Always True)';clearGroupColors();return;}
+
+  const groups=getAllGroups(ones);
+  const pis=groups.filter(g=>!groups.some(g2=>g2.minterms.length>g.minterms.length&&g.minterms.every(m=>g2.minterms.includes(m))));
+
+  // Greedy cover
+  const covered=new Set();
+  const selected=[];
+  ones.forEach(m=>{
+    const cov=pis.filter(pi=>pi.minterms.includes(m));
+    if(cov.length===1&&!selected.includes(cov[0])){selected.push(cov[0]);cov[0].minterms.forEach(x=>covered.add(x));}
+  });
+  let safety=0;
+  while(ones.some(m=>!covered.has(m))&&safety++<20){
+    const uncov=ones.filter(m=>!covered.has(m));
+    const best=pis.filter(pi=>pi.minterms.some(m=>!covered.has(m))).sort((a,b)=>b.minterms.filter(m=>!covered.has(m)).length-a.minterms.filter(m=>!covered.has(m)).length)[0];
+    if(!best)break;
+    selected.push(best);best.minterms.forEach(m=>covered.add(m));
+  }
+
+  // Color groups on K-Map
+  clearGroupColors();
+  const colors=['group0','group1','group2','group3'];
+  selected.forEach((g,gi)=>{
+    const cls=colors[gi%colors.length];
+    g.minterms.forEach(m=>{
+      const {r,c}=mintermToRC(m);
+      const cell=qs(`#kmapBody tr:nth-child(${r+1}) td:nth-child(${c+2}) .kmap-cell`);
+      if(cell)cell.classList.add(cls);
+    });
+  });
+
+  const expr=selected.length?selected.map(g=>g.expr).join(' ∨ '):'0';
+  qs('#kmapResult').innerHTML=`<span style="color:var(--text-dim)">f(A,B,C,D) = </span><span style="color:var(--logic)">${expr}</span>`;
+}
+function clearGroupColors(){qsa('.kmap-cell').forEach(c=>{c.classList.remove('group0','group1','group2','group3');});}
+buildKmapTable();
+
+/* ── PROOF STEP REVEALS (generic) ── */
+const stepCounters={};
+function revealSteps(id, tab){
+  const steps=qsa('#'+id+' .proof-step');
+  const k=id;
+  if(!stepCounters[k]) stepCounters[k]=0;
+  if(stepCounters[k]<steps.length){steps[stepCounters[k]].classList.add('revealed');stepCounters[k]++;}
+}
+function resetSteps(id){
+  qsa('#'+id+' .proof-step').forEach(s=>s.classList.remove('revealed'));
+  stepCounters[id]=0;
+}
+
+/* ── POWER SET ── */
+function computePowerSet(){
+  const raw=qs('#psInput').value.replace(/[{}]/g,'').trim();
+  const elements=raw.split(',').map(s=>s.trim()).filter(Boolean);
+  if(elements.length>4){qs('#psOutput').innerHTML='<span style="color:var(--red)">Max 4 elements for display</span>';return;}
+  const out=qs('#psOutput');
+  const subsets=[[]];
+  elements.forEach(e=>{const len=subsets.length;for(let i=0;i<len;i++)subsets.push([...subsets[i],e]);});
+  let html=`<div style="color:var(--sets);margin-bottom:6px">|P(A)| = 2<sup>${elements.length}</sup> = ${subsets.length} subsets</div>`;
+  html+=subsets.map(s=>`<span style="color:var(--blue)">{${s.join(', ')||'∅'}}</span>`).join('&nbsp;&nbsp;');
+  out.innerHTML=html;
+}
+
+/* ── VENN DIAGRAM ── */
+let currentSop='union';
+const vennDescs={
+  union:{d:'A ∪ B = {x | x ∈ A OR x ∈ B}\nEverything in A, B, or both.',ex:'A={1,2,3,4,5}, B={3,4,5,6,7}\nA∪B = {1,2,3,4,5,6,7}'},
+  intersection:{d:'A ∩ B = {x | x ∈ A AND x ∈ B}\nOnly elements in BOTH sets.',ex:'A∩B = {3,4,5}'},
+  a_minus_b:{d:'A − B = {x | x ∈ A AND x ∉ B}\nElements in A but NOT in B.',ex:'A−B = {1,2}'},
+  sym_diff:{d:'A ⊕ B = (A−B) ∪ (B−A)\nElements in one but not both.',ex:'A⊕B = {1,2,6,7}'},
+  complement_a:{d:'Aᶜ = {x ∈ U | x ∉ A}\nEverything in the universe NOT in A.',ex:'If U={1..10}: Aᶜ={6,7,8,9,10}'},
+  b_minus_a:{d:'B − A = {x | x ∈ B AND x ∉ A}\nElements in B but NOT in A.',ex:'B−A = {6,7}'}
+};
+
+function drawVenn(op){
+  const canvas=qs('#vennCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const cx1=W*0.38,cx2=W*0.62,cy=H*0.5,r=H*0.37;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0c1220';
+  ctx.fillRect(0,0,W,H);
+
+  function circle(cx){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);}
+  function fillC(cx,color){circle(cx);ctx.fillStyle=color;ctx.fill();}
+
+  const off=document.createElement('canvas');off.width=W;off.height=H;
+  const oc=off.getContext('2d');
+  const HL='rgba(167,139,250,0.38)';
+
+  if(op==='union'){fillC2(oc,cx1,cy,r,HL);fillC2(oc,cx2,cy,r,HL);}
+  else if(op==='intersection'){oc.save();circle2(oc,cx1,cy,r);oc.clip();fillC2(oc,cx2,cy,r,HL);oc.restore();}
+  else if(op==='a_minus_b'){fillC2(oc,cx1,cy,r,HL);oc.globalCompositeOperation='destination-out';fillC2(oc,cx2,cy,r,'#fff');}
+  else if(op==='b_minus_a'){fillC2(oc,cx2,cy,r,HL);oc.globalCompositeOperation='destination-out';fillC2(oc,cx1,cy,r,'#fff');}
+  else if(op==='sym_diff'){fillC2(oc,cx1,cy,r,HL);fillC2(oc,cx2,cy,r,HL);const off2=document.createElement('canvas');off2.width=W;off2.height=H;const oc2=off2.getContext('2d');oc2.save();circle2(oc2,cx1,cy,r);oc2.clip();fillC2(oc2,cx2,cy,r,'#fff');oc2.restore();oc.globalCompositeOperation='destination-out';oc.drawImage(off2,0,0);}
+  else if(op==='complement_a'){oc.fillStyle=HL;oc.fillRect(0,0,W,H);oc.globalCompositeOperation='destination-out';fillC2(oc,cx1,cy,r,'#fff');}
+
+  ctx.drawImage(off,0,0);
+
+  // Border of universe
+  ctx.strokeStyle='rgba(167,139,250,0.2)';ctx.lineWidth=1.5;ctx.strokeRect(4,4,W-8,H-8);
+
+  // Circle outlines
+  circle(cx1);ctx.strokeStyle='rgba(245,158,11,0.7)';ctx.lineWidth=2;ctx.stroke();
+  circle(cx2);ctx.strokeStyle='rgba(167,139,250,0.8)';ctx.lineWidth=2;ctx.stroke();
+
+  // Labels
+  ctx.font='bold 18px EB Garamond';ctx.textAlign='center';
+  ctx.fillStyle='#f59e0b';ctx.fillText('A',cx1-r*0.52,cy+5);
+  ctx.fillStyle='#a78bfa';ctx.fillText('B',cx2+r*0.52,cy+5);
+  ctx.font='11px JetBrains Mono';ctx.fillStyle='rgba(167,139,250,0.4)';ctx.fillText('U',W/2,16);
+
+  const info=vennDescs[op]||{};
+  qs('#vennDesc').innerHTML=info.d?info.d.replace(/\n/g,'<br>'):'';
+  qs('#vennExample').innerHTML=info.ex?info.ex.replace(/\n/g,'<br>'):'';
+}
+function fillC2(ctx,cx,cy,r,color){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
+function circle2(ctx,cx,cy,r){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);}
+
+qsa('#setOpCards .set-op-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    qsa('#setOpCards .set-op-card').forEach(c=>c.classList.remove('sel'));
+    card.classList.add('sel');
+    currentSop=card.dataset.sop;
+    drawVenn(currentSop);
+  });
+});
+setTimeout(()=>drawVenn('union'),100);
+
+/* ── CANTOR'S DIAGONALIZATION ── */
+const ROWS=6, COLS=8;
+const cantorData=[
+  [1,0,1,1,0,1,0,1],
+  [0,1,1,0,1,0,1,0],
+  [1,1,0,0,1,1,0,0],
+  [0,0,0,1,0,1,1,1],
+  [1,0,1,0,1,0,1,0],
+  [0,1,0,1,0,0,1,1],
+];
+let cantorStep=0, cantorTimer=null;
+const cantorSteps=[
+  {type:'setup',msg:'Suppose ℝ is countable. List all real numbers in (0,1) as infinite binary sequences r₁, r₂, r₃...'},
+  {type:'diagonal',msg:'Extract the diagonal: d₁ from r₁, d₂ from r₂, ..., dₙ from rₙ. The diagonal sequence is highlighted.'},
+  {type:'flip',msg:'Flip every diagonal bit: 0→1 and 1→0. This new sequence s differs from every listed number!'},
+  {type:'newrow',msg:'s ≠ r₁ (differs at position 1)\ns ≠ r₂ (differs at position 2)\n...\ns ≠ rₙ (differs at position n)\nContradiction: s is a real number not in our list! ∴ ℝ is uncountable. ∎'}
+];
+
+function buildCantorGrid(){
+  const container=qs('#cantorGrid');
+  container.innerHTML='';
+  for(let r=0;r<ROWS;r++){
+    const rowDiv=document.createElement('div');
+    rowDiv.className='cantor-row';
+    const lbl=document.createElement('span');
+    lbl.className='cantor-row-label';
+    lbl.textContent=`r${r+1}:`;
+    rowDiv.appendChild(lbl);
+    for(let c=0;c<COLS;c++){
+      const cell=document.createElement('div');
+      cell.className='cantor-cell';
+      cell.id=`cc-${r}-${c}`;
+      cell.textContent=cantorData[r][c];
+      rowDiv.appendChild(cell);
+    }
+    container.appendChild(rowDiv);
+  }
+  // New row placeholder
+  const newRow=document.createElement('div');
+  newRow.className='cantor-row';newRow.id='cantorNewRow';newRow.style.display='none';
+  const lbl2=document.createElement('span');
+  lbl2.className='cantor-row-label';lbl2.style.color='var(--red)';lbl2.textContent='s:';
+  newRow.appendChild(lbl2);
+  for(let c=0;c<COLS;c++){
+    const cell=document.createElement('div');
+    cell.className='cantor-cell new-row';cell.id=`cn-${c}`;
+    cell.textContent='?';
+    newRow.appendChild(cell);
+  }
+  container.appendChild(newRow);
+}
+
+function stepCantor(){
+  const step=cantorSteps[cantorStep];
+  qs('#cantorExplanation').innerHTML=step.msg.replace(/\n/g,'<br>');
+
+  if(step.type==='setup'){
+    // Just show the grid clean
+  } else if(step.type==='diagonal'){
+    for(let i=0;i<Math.min(ROWS,COLS);i++){
+      const cell=qs(`#cc-${i}-${i}`);
+      if(cell)cell.classList.add('diagonal');
+    }
+  } else if(step.type==='flip'){
+    for(let i=0;i<Math.min(ROWS,COLS);i++){
+      const cell=qs(`#cc-${i}-${i}`);
+      if(cell){cell.classList.remove('diagonal');cell.classList.add('diag-highlight');}
+    }
+    const newRow=qs('#cantorNewRow');newRow.style.display='flex';
+    for(let c=0;c<COLS;c++){
+      const nc=qs(`#cn-${c}`);
+      if(c<ROWS){ const orig=cantorData[c][c]; nc.textContent=orig?'0':'1'; nc.classList.add('flipped'); }
+      else { nc.textContent='?'; }
+    }
+  } else if(step.type==='newrow'){
+    // Highlight differences
+    for(let i=0;i<Math.min(ROWS,COLS);i++){
+      const rc=qs(`#cc-${i}-${i}`);
+      if(rc)rc.style.outline='2px solid var(--red)';
+    }
+  }
+
+  if(cantorStep<cantorSteps.length-1) cantorStep++;
+  else { qs('#cantorBtn').textContent='✓ Done'; clearInterval(cantorTimer); cantorTimer=null; }
+}
+
+qs('#cantorBtn').addEventListener('click',()=>{ if(cantorStep===0&&cantorTimer===null){ qs('#cantorBtn').textContent='⏸ Pause'; cantorTimer=setInterval(()=>{ stepCantor(); if(cantorStep>=cantorSteps.length){clearInterval(cantorTimer);cantorTimer=null;} },1800); stepCantor(); } else if(cantorTimer){ clearInterval(cantorTimer);cantorTimer=null;qs('#cantorBtn').textContent='▶ Resume'; } else { qs('#cantorBtn').textContent='⏸ Pause'; cantorTimer=setInterval(()=>{ stepCantor(); if(cantorStep>=cantorSteps.length){clearInterval(cantorTimer);cantorTimer=null;} },1800); } });
+qs('#cantorResetBtn').addEventListener('click',()=>{ clearInterval(cantorTimer);cantorTimer=null;cantorStep=0;buildCantorGrid();qs('#cantorExplanation').innerHTML='Click "Start Animation" to watch the argument unfold.';qs('#cantorBtn').textContent='▶ Start Animation'; });
+buildCantorGrid();
+qs('#cantorExplanation').innerHTML='Click "Start Animation" to watch the argument unfold.';
+
+/* ── RUSSELL'S PARADOX REVEAL ── */
+// All proof steps start hidden except in Cantor proof
+qsa('#cantorProof .proof-step').forEach(s=>s.classList.add('revealed'));
+
+/* ── QUIZ ENGINE ── */
+qsa('.quiz-option').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const block=btn.closest('[data-quiz]');
+    if(block.dataset.answered)return;
+    block.dataset.answered='1';
+    const correct=btn.dataset.correct==='true';
+    btn.classList.add(correct?'correct':'wrong');
+    if(!correct)block.querySelectorAll('.quiz-option').forEach(b=>{if(b.dataset.correct==='true')b.classList.add('correct');});
+    const exp=block.querySelector('.quiz-explain');
+    if(exp)exp.classList.add('show');
+  });
+});
+
+/* ── FLASHCARDS ── */
+qsa('.fc').forEach(card=>{
+  card.addEventListener('click',()=>{
+    const a=card.querySelector('.fc-a');
+    const t=card.querySelector('.fc-tog');
+    a.classList.toggle('show');
+    t.textContent=a.classList.contains('show')?'↑':'↓';
+  });
+});
+
+/* ── INIT PROOF STEP VISIBILITY ── */
+// Russell's steps
+qsa('#russellSteps .proof-step').forEach((s,i)=>{ if(i===0)s.classList.add('revealed'); });
+// Other proof steps - start all hidden
+['dpSteps','cpSteps','contrSteps','casesSteps','existSteps','uniqSteps'].forEach(id=>{
+  qsa('#'+id+' .proof-step').forEach(s=>s.classList.remove('revealed'));
+});
+
+/* ── SMOOTH SCROLL ── */
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}));
+</script>
+</body>
+</html>
