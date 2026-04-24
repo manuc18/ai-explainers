@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Tao of Physics — An Interactive Explainer</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --bg2: #f2f0eb;
+      --bg3: #e8e5de;
+      --border: #d8d4ca;
+      --text: #2a2825;
+      --text-dim: #8a8680;
+      --text-bright: #1a1815;
+      --accent: #8b5e1a;
+      --accent2: #2e6e78;
+      --accent3: #7a3a28;
+      --glow: rgba(139, 94, 26, 0.10);
+      --red: #b05540;
+      --green: #3a7a50;
+      --purple: #6a4a98;
+      --mono: 'JetBrains Mono', monospace;
+      --serif: 'Lora', Georgia, serif;
+      --display: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.85;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 28px 120px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      padding: 60px 0 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .back-link {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      display: inline-block;
+      margin-bottom: 32px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--accent);
+    }
+
+    .back-link::before {
+      content: "← ";
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 600;
+      color: var(--text-bright);
+      line-height: 1.25;
+      letter-spacing: 0.02em;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 19px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 24px 28px;
+      margin: 40px 0 56px;
+      border-radius: 2px;
+    }
+
+    .toc-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .toc ol {
+      padding-left: 20px;
+    }
+
+    .toc li {
+      margin-bottom: 6px;
+    }
+
+    .toc a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 15px;
+      font-family: var(--serif);
+      transition: color 0.2s;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    /* ── SECTIONS ── */
+    .section-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 12px;
+      margin-top: 72px;
+    }
+
+    h2 {
+      font-family: var(--display);
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 600;
+      color: var(--text-bright);
+      line-height: 1.3;
+      margin-bottom: 28px;
+      letter-spacing: 0.01em;
+    }
+
+    p {
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    strong {
+      color: var(--text-bright);
+      font-weight: 600;
+    }
+
+    em {
+      color: var(--accent2);
+      font-style: italic;
+    }
+
+    /* ── PULL QUOTE ── */
+    .pull-quote {
+      border-left: 3px solid var(--accent);
+      margin: 36px 0;
+      padding: 20px 28px;
+      background: var(--bg2);
+      font-style: italic;
+      font-size: 19px;
+      color: var(--text-bright);
+      line-height: 1.65;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .pull-quote cite {
+      display: block;
+      margin-top: 12px;
+      font-size: 13px;
+      font-family: var(--mono);
+      font-style: normal;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── MATH BOX ── */
+    .math-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px 24px;
+      margin: 24px 0;
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--accent2);
+      line-height: 1.9;
+    }
+
+    .math-box .label {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* ── TABLE ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      margin: 28px 0;
+    }
+
+    .compare-table th {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .compare-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      line-height: 1.5;
+      vertical-align: top;
+    }
+
+    .compare-table tr:hover td {
+      background: var(--bg2);
+    }
+
+    .compare-table td:first-child {
+      color: var(--accent);
+      font-weight: 600;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    /* ── INTERACTIVE BOXES ── */
+    .demo-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 28px;
+      margin: 36px 0;
+      position: relative;
+    }
+
+    .demo-box-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .demo-box-title::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .demo-caption {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 16px;
+      font-style: italic;
+      line-height: 1.55;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .slider-wrap label {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .slider-val {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      min-width: 48px;
+      text-align: right;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 7px 18px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.2s, color 0.2s;
+      margin-right: 8px;
+      margin-top: 12px;
+    }
+
+    .btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .btn.secondary {
+      border-color: var(--border);
+      color: var(--text-dim);
+    }
+
+    .btn.secondary:hover {
+      border-color: var(--text-dim);
+      color: var(--text);
+      background: transparent;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media(max-width: 580px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 100px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── YING YANG SPINNER ── */
+    @keyframes yinyang-spin {
+      from {
+        transform: rotate(0)
+      }
+
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .yin-yang-inline {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+      opacity: 0.6;
+    }
+
+    /* ── SCROLL FADE IN ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* highlight */
+    mark {
+      background: var(--glow);
+      color: var(--accent);
+      padding: 1px 4px;
+      border-radius: 2px;
+    }
+
+    .resources-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .resources-list li {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 16px;
+    }
+
+    .resources-list li:last-child {
+      border-bottom: none;
+    }
+
+    .res-title {
+      color: var(--text-bright);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .res-desc {
+      font-size: 14px;
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    /* particle label */
+    .particle-legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .particle-legend span {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <a href="#" class="back-link">AI Explainers</a>
+    <span class="tag">tao.explained</span>
+    <h1>The Tao of Physics</h1>
+    <p class="subtitle">How modern physics and ancient Eastern wisdom arrived at the same truth — and why that matters.
+    </p>
+  </div>
+
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#introduction">Introduction — Two Ways of Knowing</a></li>
+      <li><a href="#bootstrap">The Bootstrap of Reality</a></li>
+      <li><a href="#quantum">The Quantum World — Where Physics Gets Mystical</a></li>
+      <li><a href="#duality">Wave-Particle Duality & The Dance of Opposites</a></li>
+      <li><a href="#space-time">Space-Time — The Fabric of the Cosmic Dance</a></li>
+      <li><a href="#eastern">Eastern Parallels — Hinduism, Buddhism, Taoism</a></li>
+      <li><a href="#interconnected">The Interconnected Web</a></li>
+      <li><a href="#particle">Particle Physics & Yin-Yang</a></li>
+      <li><a href="#loop">The Cosmic Loop</a></li>
+      <li><a href="#resources">Further Reading</a></li>
+    </ol>
+  </nav>
+
+  <p>In 1975, physicist Fritjof Capra sat on a beach in Santa Cruz, watching the waves and suddenly saw the dance of
+    atoms as described by quantum field theory — a cosmic dance of energy, pulsing and vibrating in rhythm. In that
+    moment he realized something remarkable: the Shiva Nataraja, the Hindu god of creation and destruction performing
+    his eternal dance, was not mere mythology. <strong>It was physics.</strong></p>
+
+  <p>This is the central claim of <em>The Tao of Physics</em> — that the discoveries of modern physics, from quantum
+    mechanics to relativity, echo the fundamental insights of Eastern mystical traditions thousands of years old. Not
+    metaphorically. Not poetically. But in deep structural parallels that cut to the heart of what both traditions are
+    trying to say about <strong>the nature of reality</strong>.</p>
+
+  <p>Standard internet summaries say: "physics meets Eastern philosophy." But that's not very useful. What you actually
+    need to understand is <em>why</em> these two traditions converge, what specific ideas they share, and why this
+    convergence arose from the internal logic of each — not from any mystical coincidence.</p>
+
+  <div class="pull-quote">
+    The most important characteristic of the Eastern world view — one could almost say the essence of it — is the
+    awareness of the unity and mutual interrelation of all things and events, the experience of all phenomena in the
+    world as manifestations of a basic oneness.
+    <cite>— Fritjof Capra, The Tao of Physics (1975)</cite>
+  </div>
+
+  <!-- ════════════════════════════════ I ═══════════════════════════════ -->
+  <span class="section-num" id="introduction">I</span>
+  <h2>Introduction — Two Ways of Knowing</h2>
+
+  <p>For most of Western intellectual history, science and mysticism have been treated as opposites. Science is
+    rational, empirical, quantitative. Mysticism is intuitive, experiential, ineffable. One uses microscopes and
+    equations; the other uses meditation and metaphor. They seemed to be talking about completely different things.</p>
+
+  <p>Capra's insight is that this opposition is a surface illusion. When you push science <em>far enough</em> — when you
+    probe reality at the level of subatomic particles or at the scale of the cosmos — the rational, mechanical picture
+    breaks down. Reality becomes <strong>interconnected, dynamic, paradoxical</strong>, and ultimately beyond the grasp
+    of ordinary language.</p>
+
+  <p>And that is exactly where Eastern mysticism begins.</p>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Two Approaches to Reality</div>
+    <div class="two-col">
+      <div>
+        <canvas id="canvas-rational" width="280" height="200"></canvas>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px">
+          Western Rational: Objects in Space</div>
+      </div>
+      <div>
+        <canvas id="canvas-mystic" width="280" height="200"></canvas>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px">
+          Eastern Mystical: Fields of Relation</div>
+      </div>
+    </div>
+    <p class="demo-caption">Left: The classical picture — distinct objects with clear boundaries. Right: The
+      quantum/mystic picture — everything interpenetrating, no hard edges. Drag within each canvas to interact.</p>
+  </div>
+
+  <p>The "rational" picture feels intuitive: billiard balls bouncing off each other, clearly bounded objects following
+    predictable rules. Newton's physics. Descartes's clockwork universe. This is the world of ordinary experience.</p>
+
+  <p>The "mystic" picture feels strange: a web of relations where each node influences all others, where the observer
+    cannot be separated from the observed, where what looks like a thing is actually a <strong>pattern of
+      events</strong>. This is the world of quantum mechanics — and of the Tao.</p>
+
+  <!-- ════════════════════════════════ II ═══════════════════════════════ -->
+  <span class="section-num" id="bootstrap">II</span>
+  <h2>The Bootstrap of Reality</h2>
+
+  <p>Before diving into quantum mechanics, Capra introduces a key concept from theoretical physics called the
+    <em>bootstrap hypothesis</em> — the idea that the universe <strong>pulls itself into existence</strong> by its own
+    internal consistency.
+  </p>
+
+  <p>In the bootstrap worldview (developed by Geoffrey Chew), no particle is fundamental. Instead, each particle is made
+    of all other particles. Every thing is defined by its relations to everything else. Nothing has an independent
+    existence. This is sometimes called <em>nuclear democracy</em>.</p>
+
+  <div class="pull-quote">
+    The Buddhist concept of Indra's Net describes a vast net of jewels, each reflecting all the others — an infinite web
+    of mutual reflection with no primary jewel, no absolute center.
+    <cite>— Avatamsaka Sutra (adapted)</cite>
+  </div>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Indra's Net — Bootstrap Visualization</div>
+    <canvas id="canvas-indra" width="700" height="280" style="width:100%;max-width:700px;height:auto"></canvas>
+    <div class="slider-wrap">
+      <label>Connections</label>
+      <input type="range" id="indra-connections" min="1" max="8" value="3" step="1">
+      <span class="slider-val" id="indra-val">3</span>
+    </div>
+    <p class="demo-caption">Each jewel reflects all others. Increase connections to see how deeply each node is
+      entangled with the whole — in nuclear physics, this is not metaphor, it is the structure of the strong force.</p>
+  </div>
+
+  <p>This is not abstract poetry. Chew's bootstrap model made real, testable predictions about the hadron spectrum.
+    What's remarkable is that Capra points out that Indian philosophical traditions arrived at the same structural
+    insight — that no thing has intrinsic, independent existence — <em>purely through meditative analysis</em> thousands
+    of years earlier.</p>
+
+  <!-- ════════════════════════════════ III ═══════════════════════════════ -->
+  <span class="section-num" id="quantum">III</span>
+  <h2>The Quantum World — Where Physics Gets Mystical</h2>
+
+  <p>Classical physics — Newton, Maxwell, Einstein's special relativity — still allows for a relatively commonsense
+    picture of reality. Objects have definite positions. Waves and particles are different things. Cause precedes
+    effect.</p>
+
+  <p>Quantum mechanics destroys all of this. Below the level of atoms, reality becomes <strong>irreducibly
+      strange</strong>:</p>
+
+  <table class="compare-table">
+    <tr>
+      <th>Classical World</th>
+      <th>Quantum World</th>
+      <th>Eastern Echo</th>
+    </tr>
+    <tr>
+      <td>Definite positions</td>
+      <td>Probability clouds (wave functions)</td>
+      <td>Maya — the illusory nature of fixed forms</td>
+    </tr>
+    <tr>
+      <td>Observer separate from observed</td>
+      <td>Measurement collapses the wave function</td>
+      <td>No observer, no observation — they arise together</td>
+    </tr>
+    <tr>
+      <td>Local causes</td>
+      <td>Entanglement — non-local correlations</td>
+      <td>Dependent origination — nothing arises independently</td>
+    </tr>
+    <tr>
+      <td>Matter is solid</td>
+      <td>Matter is mostly empty, fields are primary</td>
+      <td>Sunyata — emptiness is the ground of form</td>
+    </tr>
+    <tr>
+      <td>Time is absolute</td>
+      <td>Time is relative to the observer</td>
+      <td>Time as illusion — the eternal now of Zen</td>
+    </tr>
+  </table>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">The Wave Function — Quantum Probability Cloud</div>
+    <canvas id="canvas-wavefunction" width="700" height="220" style="width:100%;max-width:700px;height:auto"></canvas>
+    <div class="slider-wrap">
+      <label>Uncertainty (ℏ)</label>
+      <input type="range" id="wf-uncertainty" min="5" max="80" value="30" step="1">
+      <span class="slider-val" id="wf-val">30</span>
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn" id="wf-measure">Measure (Collapse)</button>
+      <button class="btn secondary" id="wf-reset">Reset Wave Function</button>
+    </div>
+    <p class="demo-caption">The wave function shows where a particle <em>might</em> be — a spread of probability. When
+      you "Measure" it, the wave function collapses to a single point. Increase uncertainty to spread the probability
+      further. In Zen: grasping fixes, releasing opens.</p>
+  </div>
+
+  <p>The act of measurement — of <em>looking</em> — fundamentally alters what is observed. This is not a limitation of
+    our instruments. It is a feature of reality. Heisenberg's uncertainty principle is not about measurement error; it
+    is about the fact that certain pairs of properties (position and momentum) <strong>do not simultaneously
+      exist</strong> as definite values.</p>
+
+  <p>For the Zen Buddhist, this is not shocking. It is precisely what the teaching of <em>anatta</em> (no-self) and
+    <em>sunyata</em> (emptiness) have been saying: the apparently fixed, independent self is a construction. There is no
+    inherently existing thing "out there" waiting to be measured.
+  </p>
+
+  <!-- ════════════════════════════════ IV ═══════════════════════════════ -->
+  <span class="section-num" id="duality">IV</span>
+  <h2>Wave-Particle Duality & The Dance of Opposites</h2>
+
+  <p>One of quantum mechanics' most startling findings is that light — and indeed all matter — behaves as <strong>both a
+      wave and a particle</strong>, depending on how you look at it. This is not a contradiction to be resolved. It is
+    the way things are.</p>
+
+  <p>Bohr called this <em>complementarity</em>: wave and particle are complementary, mutually exclusive — and <em>both
+      necessary</em> — descriptions of the same reality. You cannot observe both simultaneously. Each experiment reveals
+    one face.</p>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Double-Slit Experiment — Wave or Particle?</div>
+    <canvas id="canvas-doubleslit" width="700" height="260" style="width:100%;max-width:700px;height:auto"></canvas>
+    <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn" id="ds-wave">Wave Mode (both slits)</button>
+      <button class="btn secondary" id="ds-particle">Particle Mode (observe slit)</button>
+      <button class="btn secondary" id="ds-clear">Clear</button>
+    </div>
+    <p class="demo-caption">In wave mode: both slits open, no observation — interference pattern emerges. In particle
+      mode: we observe which slit — interference vanishes. The act of knowing destroys the pattern. This is the quantum
+      Zen koan.</p>
+  </div>
+
+  <p>The parallel to Taoism is precise. The <em>Tao Te Ching</em> opens: <mark>"The Tao that can be named is not the
+      eternal Tao."</mark> The moment you fix reality into a concept — "wave" or "particle" — you have already lost the
+    living whole. The Tao, like the quantum reality, can only be approached obliquely, through paradox, through
+    complementarity.</p>
+
+  <p>Yin and Yang are the Chinese articulation of this principle: two seemingly opposite forces that are not actually in
+    conflict but are <strong>interdependent aspects of a single whole</strong>. Neither exists without the other.
+    Neither is absolute. One transforms into the other continuously.</p>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Yin-Yang as Complementarity</div>
+    <canvas id="canvas-yinyang" width="700" height="240" style="width:100%;max-width:700px;height:auto"></canvas>
+    <div class="slider-wrap">
+      <label>Transformation speed</label>
+      <input type="range" id="yy-speed" min="1" max="10" value="4" step="1">
+      <span class="slider-val" id="yy-val">4</span>
+    </div>
+    <p class="demo-caption">The boundary between Yin and Yang is never straight — it is always a flowing curve. One
+      contains the seed of the other (the dots). Similarly, in quantum field theory, every particle has an antiparticle,
+      and the vacuum itself seethes with virtual particle-antiparticle pairs continuously emerging and annihilating.</p>
+  </div>
+
+  <!-- ════════════════════════════════ V ═══════════════════════════════ -->
+  <span class="section-num" id="space-time">V</span>
+  <h2>Space-Time — The Fabric of the Cosmic Dance</h2>
+
+  <p>Einstein's special relativity dissolves another pillar of classical common sense: the absolute, universal flow of
+    time. Two observers moving relative to each other will genuinely measure different durations, different lengths,
+    different orderings of events. Neither is wrong. <strong>Space and time are not background containers — they are
+      dynamic, observer-dependent structures.</strong></p>
+
+  <p>General relativity goes further: matter curves space-time. The geometry of the universe is not fixed but shaped by
+    the energy within it. There is no arena separate from the actors. Stage and play are one.</p>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Space-Time Curvature — Mass Bends the Fabric</div>
+    <canvas id="canvas-spacetime" width="700" height="280" style="width:100%;max-width:700px;height:auto"></canvas>
+    <div class="slider-wrap">
+      <label>Mass</label>
+      <input type="range" id="st-mass" min="0" max="100" value="50" step="1">
+      <span class="slider-val" id="st-val">50</span>
+    </div>
+    <p class="demo-caption">Drag the mass slider. As mass increases, nearby space-time curves more steeply. Light
+      follows these curves — hence gravitational lensing. The Vedantic concept of Brahman (the ground of being) is
+      similarly not a container for the world but the very fabric from which the world is woven.</p>
+  </div>
+
+  <p>The Sanskrit concept of <em>Brahman</em> — the ultimate reality underlying all appearances — bears striking
+    structural resemblance to the space-time field. Brahman is not a thing in the universe; it is the substrate from
+    which all things arise and into which all things dissolve. It does not stand apart from the world of form
+    (<em>Saguna Brahman</em>) but is both its ground and its expression.</p>
+
+  <!-- ════════════════════════════════ VI ═══════════════════════════════ -->
+  <span class="section-num" id="eastern">VI</span>
+  <h2>Eastern Parallels — Hinduism, Buddhism, Taoism</h2>
+
+  <p>Capra is careful to treat three major Eastern traditions on their own terms before drawing parallels. Each has its
+    own emphasis:</p>
+
+  <table class="compare-table">
+    <tr>
+      <th>Tradition</th>
+      <th>Core Insight</th>
+      <th>Physics Parallel</th>
+    </tr>
+    <tr>
+      <td>Hinduism</td>
+      <td>Brahman/Atman unity — the cosmic self and individual self are one; reality is dynamic, not static (Shakti,
+        Shiva's dance)</td>
+      <td>Quantum field theory; the vacuum as dynamic ground of all particles</td>
+    </tr>
+    <tr>
+      <td>Buddhism</td>
+      <td>Sunyata (emptiness); dependent origination — nothing exists independently; impermanence is the law</td>
+      <td>Bootstrap; particles defined only relationally; quantum impermanence</td>
+    </tr>
+    <tr>
+      <td>Taoism</td>
+      <td>The Tao as the unnamable, flowing principle underlying all change; Wu Wei (non-forcing); cyclical
+        transformation</td>
+      <td>Quantum processes as self-organizing; gauge symmetry; cyclic cosmologies</td>
+    </tr>
+  </table>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Shiva's Cosmic Dance — Nataraja as Quantum Field</div>
+    <canvas id="canvas-nataraja" width="700" height="300" style="width:100%;max-width:700px;height:auto"></canvas>
+    <p class="demo-caption">The cosmic dance of Shiva Nataraja represents five acts: creation (Srishti), preservation
+      (Sthiti), dissolution (Samhara), concealment (Tirobhava), and grace (Anugraha). Modern physics recognizes these
+      same five dynamics in quantum field processes: particle creation, stable states, annihilation, virtual particles,
+      and symmetry-breaking. Carl Sagan and Capra both note: the Nataraja was doing particle physics in 900 CE.</p>
+  </div>
+
+  <!-- ════════════════════════════════ VII ═══════════════════════════════ -->
+  <span class="section-num" id="interconnected">VII</span>
+  <h2>The Interconnected Web</h2>
+
+  <p>Perhaps the deepest theme running through both quantum physics and Eastern mysticism is the idea that
+    <strong>reality is fundamentally relational</strong>. There are no isolated things — only events, interactions,
+    relationships.
+  </p>
+
+  <p>In quantum mechanics, this appears as <em>entanglement</em>: two particles that have interacted remain correlated
+    regardless of the distance between them. Measure one, and you instantly know something about the other — even if it
+    is on the far side of the galaxy. Einstein called this "spooky action at a distance" and refused to accept it.
+    Bell's theorem (1964) and subsequent experiments proved: entanglement is real. <strong>The universe is non-locally
+      connected.</strong></p>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Quantum Entanglement — Non-Local Correlation</div>
+    <canvas id="canvas-entangle" width="700" height="220" style="width:100%;max-width:700px;height:auto"></canvas>
+    <div style="margin-top:12px">
+      <button class="btn" id="ent-measure">Measure Particle A</button>
+      <button class="btn secondary" id="ent-reset">New Entangled Pair</button>
+    </div>
+    <p class="demo-caption">Two particles fly apart (photons from a common source). Their polarizations are undetermined
+      — a superposition. Click "Measure Particle A": both states collapse instantly and correlate, no matter the
+      distance. This is Bell non-locality. In Hua-yen Buddhism: the interpenetration of all dharmas.</p>
+  </div>
+
+  <p>The Buddhist concept of <em>pratītyasamutpāda</em> (dependent origination) states that <strong>nothing has
+      intrinsic, independent existence</strong>. Everything arises in dependence on conditions. Change the conditions
+    and the thing changes — or ceases. This is not a vague spiritual claim; it is isomorphic to the structure of quantum
+    field theory, where particles are excitations of fields, fields interact, and what we call "particles" are patterns
+    of excitation that only exist relationally.</p>
+
+  <!-- ════════════════════════════════ VIII ═══════════════════════════════ -->
+  <span class="section-num" id="particle">VIII</span>
+  <h2>Particle Physics & Yin-Yang</h2>
+
+  <p>By the 1960s and 70s, particle accelerators had revealed a bewildering zoo of subatomic particles. The quark model
+    of Gell-Mann and Zweig eventually organized these into families based on fundamental constituents. What emerged was
+    a picture of reality built not from solid stuff but from <strong>symmetry patterns</strong> — abstract mathematical
+    relationships.</p>
+
+  <p>Every known particle has an antiparticle — opposite in charge, otherwise identical. Matter and antimatter emerged
+    together from the Big Bang. The fact that matter dominated (barely) is one of physics' great unsolved puzzles. But
+    the symmetry is real: the universe at its deepest level is organized around complementary pairs.</p>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Matter-Antimatter Creation & Annihilation</div>
+    <canvas id="canvas-matter" width="700" height="240" style="width:100%;max-width:700px;height:auto"></canvas>
+    <div style="margin-top:12px">
+      <button class="btn" id="mat-create">Create Pair</button>
+      <button class="btn secondary" id="mat-reset">Reset</button>
+    </div>
+    <div class="particle-legend">
+      <span><span class="dot" style="background:var(--accent)"></span>Matter</span>
+      <span><span class="dot" style="background:var(--accent3)"></span>Antimatter</span>
+      <span><span class="dot" style="background:var(--accent2)"></span>Photon (γ)</span>
+    </div>
+    <p class="demo-caption">In the vacuum, virtual particle-antimatter pairs continuously pop into existence and
+      annihilate. Click "Create Pair" to see matter/antimatter emerge from a photon collision, travel, and annihilate
+      back to photons. This cycle mirrors the Taoist concept of perpetual transformation — Yin becoming Yang becoming
+      Yin.</p>
+  </div>
+
+  <p>The quarks themselves come in pairs: up/down, charm/strange, top/bottom. Three generations of matter, each a
+    heavier echo of the previous. The Standard Model organizes them under three gauge symmetries — SU(3) × SU(2) × U(1)
+    — abstract mathematical symmetry groups that are more real than the particles they govern.</p>
+
+  <div class="math-box">
+    <span class="label">The Standard Model Lagrangian (schematic)</span>
+    ℒ = − ¼ F<sub>μν</sub>F<sup>μν</sup> + iψ̄Dψ + ψ<sub>i</sub>y<sub>ij</sub>ψ<sub>j</sub>φ + h.c. + |Dφ|² − V(φ)
+    <br><br>
+    <span style="color:var(--text-dim);font-size:12px">
+      F: field strength tensor &nbsp;|&nbsp; ψ: fermion fields &nbsp;|&nbsp; D: covariant derivative &nbsp;|&nbsp; φ:
+      Higgs field &nbsp;|&nbsp; V: potential<br>
+      Everything observable emerges from relationships between fields — nothing is fundamentally "a thing."
+    </span>
+  </div>
+
+  <!-- ════════════════════════════════ IX ═══════════════════════════════ -->
+  <span class="section-num" id="loop">IX</span>
+  <h2>The Cosmic Loop</h2>
+
+  <p>Both modern cosmology and Eastern tradition see the universe as cyclical rather than linear. The Big Bang is not
+    the absolute beginning in many modern frameworks — it may be one oscillation in an endless cycle of expansion and
+    contraction. The Hindu concept of <em>kalpas</em> — vast cosmic cycles of creation and dissolution — maps onto
+    contemporary cyclic cosmologies with eerie precision.</p>
+
+  <div class="demo-box fade-in">
+    <div class="demo-box-title">Cosmic Expansion — The Breath of Brahma</div>
+    <canvas id="canvas-cosmos" width="700" height="260" style="width:100%;max-width:700px;height:auto"></canvas>
+    <div class="slider-wrap">
+      <label>Cosmic Time</label>
+      <input type="range" id="cosmos-time" min="0" max="100" value="50" step="1">
+      <span class="slider-val" id="cosmos-val">t = 50</span>
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn" id="cosmos-animate">Animate Cycle</button>
+    </div>
+    <p class="demo-caption">Drag the slider from 0 (Big Bang singularity) to 100 (maximum expansion) and back. In Hindu
+      cosmology: Brahma exhales — the universe expands. Brahma inhales — the universe contracts. One breath of Brahma =
+      ~311 trillion years. Current age of universe: ~13.8 billion years. We are in a very early exhale.</p>
+  </div>
+
+  <p>What makes Capra's argument most compelling at this point is not the surface-level poetry — "isn't it nice that
+    Hindus talked about cycles and cosmology has cycles." It is that both traditions reached these ideas through a
+    similar <em>method</em>: by pushing their respective frameworks to the limit and discovering that at the limits, the
+    familiar categories break down. The physicist finds that "matter" dissolves into "field" dissolves into "symmetry."
+    The meditator finds that "self" dissolves into "experience" dissolves into... the Tao.</p>
+
+  <div class="pull-quote">
+    Physics has moved from the study of objects to the study of events, from things to relations, from substance to
+    process. This is exactly what mystical insight has always been pointing toward.
+    <cite>— Fritjof Capra</cite>
+  </div>
+
+  <p>The book ends not with a grand unified theory of physics-plus-mysticism, but with a more modest and honest claim:
+    these two traditions have arrived at <strong>complementary maps of the same territory</strong>. Neither is
+    sufficient alone. Science without wisdom can build weapons. Wisdom without science can collapse into superstition.
+    But together — held in genuine dialogue — they might reveal something about the nature of mind, reality, and the
+    place of human consciousness in the cosmos that neither can see on its own.</p>
+
+  <!-- ════════════════════════════════ X ═══════════════════════════════ -->
+  <span class="section-num" id="resources">X</span>
+  <h2>Further Reading</h2>
+
+  <ul class="resources-list">
+    <li>
+      <span class="res-title">The Tao of Physics — Fritjof Capra (1975)</span>
+      <span class="res-desc">The original. Read it in full. The chapters on Buddhism and quantum mechanics are
+        especially strong.</span>
+    </li>
+    <li>
+      <span class="res-title">The Web of Life — Fritjof Capra (1996)</span>
+      <span class="res-desc">Capra's follow-up, extending the systems-thinking framework to biology and ecology. The
+        bootstrap idea applied to living systems.</span>
+    </li>
+    <li>
+      <span class="res-title">QED: The Strange Theory of Light and Matter — Richard Feynman</span>
+      <span class="res-desc">The best lay explanation of quantum electrodynamics. Read alongside Capra to see what is
+        being paralleled.</span>
+    </li>
+    <li>
+      <span class="res-title">The Tao Te Ching — Lao Tzu (trans. Stephen Mitchell)</span>
+      <span class="res-desc">81 short verses. Read slowly. The first verse — on the unnamable Tao — is the entire
+        book.</span>
+    </li>
+    <li>
+      <span class="res-title">In Search of Schrödinger's Cat — John Gribbin</span>
+      <span class="res-desc">A thorough, accessible history of quantum mechanics. Essential context for understanding
+        what Capra is drawing on.</span>
+    </li>
+    <li>
+      <span class="res-title">The Heart Sutra</span>
+      <span class="res-desc">"Form is emptiness, emptiness is form." 260 characters in the original Sanskrit. The most
+        compressed statement of quantum ontology in existence.</span>
+    </li>
+  </ul>
+
+  <div
+    style="margin-top:60px;padding:28px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;text-align:center">
+    <div style="font-family:var(--display);font-size:20px;color:var(--accent);margin-bottom:12px">The Lesson</div>
+    <div style="font-style:italic;color:var(--text-dim);font-size:17px;line-height:1.7">
+      Reality at its deepest level is dynamic, relational, and paradoxical.<br>
+      You cannot understand it until you stop trying to hold it still.
+    </div>
+  </div>
+
+  <div class="footer">
+    The Tao of Physics — An Interactive Explainer &nbsp;·&nbsp; 2026
+  </div>
+
+  <script>
+    // ══════════════════════════════════════
+    // UTILITY
+    // ══════════════════════════════════════
+    function lerp(a, b, t) { return a + (b - a) * t }
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)) }
+    function hexToRgb(hex) { const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16); return [r, g, b] }
+
+    const ACCENT = '#8b5e1a';
+    const ACCENT2 = '#2e6e78';
+    const ACCENT3 = '#7a3a28';
+    const DIM = '#d8d4ca';
+    const TEXT = '#2a2825';
+    const BG2 = '#f2f0eb';
+
+    // ══════════════════════════════════════
+    // SCROLL FADE IN
+    // ══════════════════════════════════════
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible') } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ══════════════════════════════════════
+    // 1. TWO APPROACHES - RATIONAL (grid of dots)
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-rational');
+      const ctx = c.getContext('2d');
+      const W = c.width, H = c.height;
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const rows = 5, cols = 7, rw = W / cols, rh = H / rows;
+        for (let r = 0; r < rows; r++)for (let co = 0; co < cols; co++) {
+          const x = rw * (co + 0.5), y = rh * (r + 0.5);
+          ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2);
+          ctx.fillStyle = '#8b5e1a'; ctx.fill();
+        }
+      }
+      draw();
+      c.addEventListener('mousemove', e => {
+        const rect = c.getBoundingClientRect(), mx = (e.clientX - rect.left) * (W / rect.width), my = (e.clientY - rect.top) * (H / rect.height);
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const rows = 5, cols = 7, rw = W / cols, rh = H / rows;
+        for (let r = 0; r < rows; r++)for (let co = 0; co < cols; co++) {
+          const x = rw * (co + 0.5), y = rh * (r + 0.5);
+          const d = Math.hypot(x - mx, y - my), glow = clamp(1 - d / 80, 0, 1);
+          ctx.beginPath(); ctx.arc(x, y, 10 + glow * 6, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(139,94,26,${0.4 + glow * 0.6})`; ctx.fill();
+        }
+      });
+      c.addEventListener('mouseleave', draw);
+    })();
+
+    // ══════════════════════════════════════
+    // 2. MYSTIC CANVAS - field of ripples
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-mystic');
+      const ctx = c.getContext('2d');
+      const W = c.width, H = c.height;
+      let mx = W / 2, my = H / 2, t = 0, raf;
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        for (let x = 0; x < W; x += 12)for (let y = 0; y < H; y += 12) {
+          const d = Math.hypot(x - mx, y - my);
+          const wave = Math.sin(d * 0.07 - t * 2) * 0.5 + 0.5;
+          const wave2 = Math.sin(d * 0.04 + t) * 0.5 + 0.5;
+          const mix = wave * wave2;
+          const r = Math.round(46 + mix * 30), g = Math.round(110 + mix * 40), b = Math.round(120 + mix * 30);
+          ctx.beginPath(); ctx.arc(x, y, 3 + mix * 3, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${r},${g},${b},${0.4 + mix * 0.5})`; ctx.fill();
+        }
+        t += 0.018;
+        raf = requestAnimationFrame(draw);
+      }
+      draw();
+      c.addEventListener('mousemove', e => {
+        const rect = c.getBoundingClientRect();
+        mx = (e.clientX - rect.left) * (W / rect.width);
+        my = (e.clientY - rect.top) * (H / rect.height);
+      });
+    })();
+
+    // ══════════════════════════════════════
+    // 3. INDRA'S NET
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-indra');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      const slider = document.getElementById('indra-connections');
+      const valEl = document.getElementById('indra-val');
+      let nodes = [];
+      function genNodes() {
+        nodes = [];
+        const n = 12;
+        for (let i = 0; i < n; i++) {
+          const angle = (i / n) * Math.PI * 2;
+          const r = Math.min(W, H) * 0.35;
+          nodes.push({
+            x: W / 2 + Math.cos(angle) * r, y: H / 2 + Math.sin(angle) * r,
+            phase: Math.random() * Math.PI * 2, speed: 0.3 + Math.random() * 0.5
+          });
+        }
+        // add a few random interior
+        for (let i = 0; i < 4; i++) {
+          nodes.push({
+            x: W * 0.3 + Math.random() * W * 0.4, y: H * 0.2 + Math.random() * H * 0.6,
+            phase: Math.random() * Math.PI * 2, speed: 0.2 + Math.random() * 0.4
+          });
+        }
+      }
+      genNodes();
+      let t = 0, connections = 3;
+      slider.addEventListener('input', () => { connections = +slider.value; valEl.textContent = connections; });
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        // draw edges
+        for (let i = 0; i < nodes.length; i++) {
+          const dists = nodes.map((n, j) => ({ j, d: Math.hypot(nodes[i].x - n.x, nodes[i].y - n.y) }))
+            .filter(d => d.j !== i).sort((a, b) => a.d - b.d).slice(0, connections);
+          for (const { j } of dists) {
+            const pulse = (Math.sin(t * 1.5 + nodes[i].phase) * 0.5 + 0.5) * 0.6 + 0.1;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.strokeStyle = `rgba(139,94,26,${pulse * 0.35})`;
+            ctx.lineWidth = 1; ctx.stroke();
+          }
+        }
+        // draw nodes
+        for (let i = 0; i < nodes.length; i++) {
+          const pulse = Math.sin(t * nodes[i].speed + nodes[i].phase) * 0.5 + 0.5;
+          const r = 5 + pulse * 4;
+          const grad = ctx.createRadialGradient(nodes[i].x, nodes[i].y, 0, nodes[i].x, nodes[i].y, r * 3);
+          grad.addColorStop(0, `rgba(139,94,26,${0.5 + pulse * 0.4})`);
+          grad.addColorStop(1, 'rgba(139,94,26,0)');
+          ctx.beginPath(); ctx.arc(nodes[i].x, nodes[i].y, r * 3, 0, Math.PI * 2);
+          ctx.fillStyle = grad; ctx.fill();
+          ctx.beginPath(); ctx.arc(nodes[i].x, nodes[i].y, r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(100,60,10,${0.8 + pulse * 0.2})`; ctx.fill();
+        }
+        t += 0.012;
+        requestAnimationFrame(draw);
+      }
+      draw();
+      window.addEventListener('resize', () => { resize(); genNodes(); });
+    })();
+
+    // ══════════════════════════════════════
+    // 4. WAVE FUNCTION
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-wavefunction');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      const slider = document.getElementById('wf-uncertainty');
+      const valEl = document.getElementById('wf-val');
+      let collapsed = false, collapsedX = null, sigma = 30, t = 0;
+
+      function gaussian(x, mu, sig) { return Math.exp(-0.5 * ((x - mu) / sig) ** 2); }
+      function drawWF() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const mu = W / 2;
+        if (!collapsed) {
+          ctx.beginPath();
+          for (let x = 0; x <= W; x++) {
+            const prob = gaussian(x, mu, sigma);
+            const wave = prob * Math.cos((x - mu) * 0.12 + t * 3) * H * 0.35;
+            const y = H / 2 - wave;
+            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = '#2e6e78'; ctx.lineWidth = 2; ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(0, H / 2);
+          for (let x = 0; x <= W; x++) {
+            const prob = gaussian(x, mu, sigma);
+            const y = H / 2 - prob * H * 0.38;
+            ctx.lineTo(x, y);
+          }
+          ctx.lineTo(W, H / 2); ctx.closePath();
+          ctx.fillStyle = 'rgba(46,110,120,0.10)'; ctx.fill();
+          ctx.fillStyle = 'rgba(46,110,120,0.6)';
+          ctx.font = `11px 'JetBrains Mono'`;
+          ctx.fillText('ψ(x)', 8, 24);
+          ctx.fillText('|ψ|² (probability density)', 8, H - 10);
+        } else {
+          ctx.beginPath(); ctx.moveTo(collapsedX, H); ctx.lineTo(collapsedX, H * 0.1);
+          ctx.strokeStyle = '#8b5e1a'; ctx.lineWidth = 3; ctx.stroke();
+          const grad = ctx.createLinearGradient(collapsedX - 30, 0, collapsedX + 30, 0);
+          grad.addColorStop(0, 'rgba(139,94,26,0)');
+          grad.addColorStop(0.5, 'rgba(139,94,26,0.2)');
+          grad.addColorStop(1, 'rgba(139,94,26,0)');
+          ctx.fillStyle = grad; ctx.fillRect(collapsedX - 30, H * 0.1, 60, H * 0.9);
+          ctx.fillStyle = '#8b5e1a'; ctx.font = `12px 'JetBrains Mono'`;
+          ctx.fillText('Collapsed!', collapsedX + 8, H * 0.15);
+        }
+      }
+      function loop() { drawWF(); t += 0.04; if (!collapsed) requestAnimationFrame(loop); }
+      loop();
+      slider.addEventListener('input', () => { sigma = +slider.value; valEl.textContent = sigma; });
+      document.getElementById('wf-measure').addEventListener('click', () => {
+        if (!collapsed) {
+          // sample from gaussian
+          const mu = W / 2, u1 = Math.random(), u2 = Math.random();
+          const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+          collapsedX = clamp(mu + z * sigma, 20, W - 20);
+          collapsed = true; drawWF();
+        }
+      });
+      document.getElementById('wf-reset').addEventListener('click', () => {
+        collapsed = false; collapsedX = null;
+        function l() { drawWF(); t += 0.04; if (!collapsed) requestAnimationFrame(l); }
+        l();
+      });
+      window.addEventListener('resize', () => { resize(); });
+    })();
+
+    // ══════════════════════════════════════
+    // 5. DOUBLE SLIT
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-doubleslit');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      let mode = 'wave'; // wave or particle
+      let particles = [];
+      let screen = new Float32Array(300);
+      let t = 0;
+
+      function drawWaveMode() {
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const slitY1 = H * 0.38, slitY2 = H * 0.62, barrierX = W * 0.38, screenX = W * 0.82;
+        const src_x = W * 0.08, src_y = H / 2;
+        ctx.beginPath(); ctx.arc(src_x, src_y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#8b5e1a'; ctx.fill();
+        for (let r = 0; r < 120; r += 20) {
+          const phase = (r - t * 30) % 120;
+          const alpha = Math.max(0, 0.6 - phase / 120) * 0.4;
+          ctx.beginPath(); ctx.arc(src_x, src_y, phase, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(139,94,26,${alpha})`; ctx.lineWidth = 1; ctx.stroke();
+        }
+        ctx.fillStyle = '#d8d4ca';
+        ctx.fillRect(barrierX - 3, 0, 6, slitY1 - 12);
+        ctx.fillRect(barrierX - 3, slitY1 + 12, 6, slitY2 - slitY1 - 24);
+        ctx.fillRect(barrierX - 3, slitY2 + 12, 6, H - slitY2 - 12);
+        ctx.fillRect(screenX, 0, 4, H);
+        const N = 200;
+        for (let i = 0; i < N; i++) {
+          const y = i / N * H;
+          const d1 = Math.hypot(screenX - barrierX, y - slitY1);
+          const d2 = Math.hypot(screenX - barrierX, y - slitY2);
+          const phase_diff = (d1 - d2) * 0.18;
+          const intensity = (Math.cos(phase_diff) + 1) / 2;
+          const pulse = (Math.sin(t * 4 + i * 0.05) * 0.2 + 0.8) * intensity;
+          ctx.fillStyle = `rgba(46,110,120,${pulse * 0.7})`;
+          ctx.fillRect(screenX + 5, y, 18 * pulse + 2, 2);
+        }
+        ctx.fillStyle = 'rgba(46,110,120,0.7)';
+        ctx.font = `11px 'JetBrains Mono'`;
+        ctx.fillText('interference', screenX + 8, H - 10);
+        ctx.fillStyle = '#8b5e1a'; ctx.fillText('wave mode', 8, 16);
+      }
+
+      function drawParticleMode() {
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const slitY1 = H * 0.38, slitY2 = H * 0.62, barrierX = W * 0.38, screenX = W * 0.82;
+        ctx.fillStyle = '#d8d4ca';
+        ctx.fillRect(barrierX - 3, 0, 6, slitY1 - 12);
+        ctx.fillRect(barrierX - 3, slitY1 + 12, 6, slitY2 - slitY1 - 24);
+        ctx.fillRect(barrierX - 3, slitY2 + 12, 6, H - slitY2 - 12);
+        ctx.fillRect(screenX, 0, 4, H);
+        for (const p of particles) {
+          ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = p.slit === 0 ? '#8b5e1a' : '#7a3a28'; ctx.fill();
+        }
+        ctx.fillStyle = 'rgba(122,58,40,0.4)'; ctx.fillRect(barrierX - 2, slitY1 - 12, 4, 24);
+        ctx.fillStyle = 'rgba(139,94,26,0.4)'; ctx.fillRect(barrierX - 2, slitY2 - 12, 4, 24);
+        ctx.fillStyle = '#2a2825'; ctx.font = `10px 'JetBrains Mono'`;
+        ctx.fillText('slit A', barrierX + 6, slitY1 + 4);
+        ctx.fillText('slit B', barrierX + 6, slitY2 + 4);
+        ctx.fillStyle = '#7a3a28'; ctx.fillText('particle mode (observed)', 8, 16);
+        ctx.fillStyle = 'rgba(122,58,40,0.6)'; ctx.font = `11px 'JetBrains Mono'`;
+        ctx.fillText('two bands — no interference', screenX + 8, H - 10);
+      }
+
+      function spawnParticle() {
+        const slit = Math.random() < 0.5 ? 0 : 1;
+        const slitY = slit === 0 ? H * 0.38 : H * 0.62;
+        const angle = (Math.random() - 0.5) * 0.3;
+        particles.push({ x: W * 0.38, y: slitY, vx: 3, vy: Math.tan(angle) * 3, slit, done: false });
+      }
+
+      let particleTimer = 0;
+      function loop() {
+        if (mode === 'wave') { drawWaveMode(); }
+        else {
+          particleTimer++;
+          if (particleTimer % 8 === 0) spawnParticle();
+          for (const p of particles) { p.x += p.vx; p.y += p.vy; }
+          particles = particles.filter(p => p.x < W * 0.85);
+          drawParticleMode();
+        }
+        t += 0.016; requestAnimationFrame(loop);
+      }
+      loop();
+      document.getElementById('ds-wave').addEventListener('click', () => { mode = 'wave'; });
+      document.getElementById('ds-particle').addEventListener('click', () => { mode = 'particle'; particles = []; });
+      document.getElementById('ds-clear').addEventListener('click', () => { particles = []; });
+      window.addEventListener('resize', resize);
+    })();
+
+    // ══════════════════════════════════════
+    // 6. YIN YANG
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-yinyang');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      const slider = document.getElementById('yy-speed');
+      const valEl = document.getElementById('yy-val');
+      let speed = 4, angle = 0;
+      slider.addEventListener('input', () => { speed = +slider.value; valEl.textContent = speed; });
+      function drawYinYang(cx, cy, r, a) {
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(a);
+        // dark half
+        ctx.beginPath(); ctx.arc(0, 0, r, Math.PI * 1.5, Math.PI * 0.5, false); ctx.fillStyle = '#2a2825'; ctx.fill();
+        ctx.beginPath(); ctx.arc(0, 0, r, Math.PI * 0.5, Math.PI * 1.5, false); ctx.fillStyle = '#fafaf8'; ctx.fill();
+        // small circles
+        ctx.beginPath(); ctx.arc(0, -r / 2, r / 2, 0, Math.PI * 2); ctx.fillStyle = '#2a2825'; ctx.fill();
+        ctx.beginPath(); ctx.arc(0, r / 2, r / 2, 0, Math.PI * 2); ctx.fillStyle = '#fafaf8'; ctx.fill();
+        ctx.beginPath(); ctx.arc(0, -r / 2, r / 8, 0, Math.PI * 2); ctx.fillStyle = '#fafaf8'; ctx.fill();
+        ctx.beginPath(); ctx.arc(0, r / 2, r / 8, 0, Math.PI * 2); ctx.fillStyle = '#2a2825'; ctx.fill();
+        // border
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(139,94,26,0.4)'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.restore();
+      }
+      // secondary visualization: field lines
+      function drawField() {
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const r = Math.min(H, W * 0.3) * 0.38;
+        const cx = W / 2, cy = H / 2;
+        for (let x = 0; x < W; x += 18)for (let y = 0; y < H; y += 18) {
+          const dx = x - cx, dy = y - cy;
+          const dist = Math.hypot(dx, dy);
+          const theta = Math.atan2(dy, dx) + angle;
+          const field = Math.sin(theta * 2 + dist * 0.02) * 0.5 + 0.5;
+          ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2);
+          const bright = field;
+          ctx.fillStyle = `rgba(${lerp(200, 139, bright)},${lerp(195, 94, bright)},${lerp(185, 26, bright)},${0.12 + bright * 0.18})`;
+          ctx.fill();
+        }
+        drawYinYang(cx, cy, r, angle);
+        ctx.fillStyle = 'rgba(42,40,37,0.45)'; ctx.font = `12px 'JetBrains Mono'`;
+        ctx.fillText('YIN', cx - r * 1.8, cy + 5);
+        ctx.fillStyle = 'rgba(42,40,37,0.45)'; ctx.fillText('YANG', cx + r * 1.3, cy + 5);
+      }
+      function loop() {
+        drawField();
+        angle += 0.005 * speed;
+        requestAnimationFrame(loop);
+      }
+      loop();
+      window.addEventListener('resize', resize);
+    })();
+
+    // ══════════════════════════════════════
+    // 7. SPACE-TIME CURVATURE
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-spacetime');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      const slider = document.getElementById('st-mass');
+      const valEl = document.getElementById('st-val');
+      let mass = 50;
+      slider.addEventListener('input', () => { mass = +slider.value; valEl.textContent = mass; draw(); });
+      function draw() {
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2, gridStep = 30, depth = mass / 100;
+        const cols = Math.ceil(W / gridStep) + 2, rows = Math.ceil(H / gridStep) + 2;
+        ctx.strokeStyle = 'rgba(180,170,155,0.9)'; ctx.lineWidth = 1;
+        for (let r = 0; r <= rows; r++) {
+          ctx.beginPath();
+          for (let co = 0; co <= cols; co++) {
+            const gx = co * gridStep - gridStep;
+            const gy = r * gridStep - gridStep;
+            const dx = gx - cx, dy = gy - cy;
+            const dist = Math.hypot(dx, dy);
+            const pull = depth * 60 * Math.exp(-dist * dist / (2 * (W * 0.25) ** 2));
+            const nx = gx + dx / Math.max(dist, 1) * pull;
+            const ny = gy + dy / Math.max(dist, 1) * pull;
+            co === 0 ? ctx.moveTo(nx, ny) : ctx.lineTo(nx, ny);
+          }
+          ctx.stroke();
+        }
+        for (let co = 0; co <= cols; co++) {
+          ctx.beginPath();
+          for (let r = 0; r <= rows; r++) {
+            const gx = co * gridStep - gridStep;
+            const gy = r * gridStep - gridStep;
+            const dx = gx - cx, dy = gy - cy;
+            const dist = Math.hypot(dx, dy);
+            const pull = depth * 60 * Math.exp(-dist * dist / (2 * (W * 0.25) ** 2));
+            const nx = gx + dx / Math.max(dist, 1) * pull;
+            const ny = gy + dy / Math.max(dist, 1) * pull;
+            r === 0 ? ctx.moveTo(nx, ny) : ctx.lineTo(nx, ny);
+          }
+          ctx.stroke();
+        }
+        // central mass glow
+        const r = 8 + mass * 0.18;
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 4);
+        grad.addColorStop(0, 'rgba(139,94,26,0.9)');
+        grad.addColorStop(0.3, 'rgba(139,94,26,0.3)');
+        grad.addColorStop(1, 'rgba(139,94,26,0)');
+        ctx.beginPath(); ctx.arc(cx, cy, r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = grad; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = '#8b5e1a'; ctx.fill();
+        ctx.fillStyle = '#2a2825'; ctx.font = `11px 'JetBrains Mono'`;
+        ctx.fillText(`mass = ${mass}`, cx + r + 8, cy + 4);
+      }
+      draw();
+      window.addEventListener('resize', () => { resize(); draw(); });
+    })();
+
+    // ══════════════════════════════════════
+    // 8. NATARAJA COSMIC DANCE
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-nataraja');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      let t = 0;
+      const acts = [
+        { name: 'Srishti (Creation)', color: '#7aab8a', angle: 0 },
+        { name: 'Sthiti (Preservation)', color: '#c9a84c', angle: Math.PI * 0.4 },
+        { name: 'Samhara (Dissolution)', color: '#c97a60', angle: Math.PI * 0.8 },
+        { name: 'Tirobhava (Concealment)', color: '#9b7ab8', angle: Math.PI * 1.2 },
+        { name: 'Anugraha (Grace)', color: '#7b9fa6', angle: Math.PI * 1.6 },
+      ];
+      function draw() {
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.38;
+        // outer ring of fire
+        for (let i = 0; i < 60; i++) {
+          const angle = (i / 60) * Math.PI * 2 + t * 0.3;
+          const flicker = 1 + Math.sin(i * 2.1 + t * 4) * 0.15;
+          const x1 = cx + Math.cos(angle) * R * 0.88;
+          const y1 = cy + Math.sin(angle) * R * 0.88;
+          const x2 = cx + Math.cos(angle) * (R + 18 * flicker);
+          const y2 = cy + Math.sin(angle) * (R + 18 * flicker);
+          ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+          const hue = i * 6;
+          ctx.strokeStyle = `hsla(${hue},80%,60%,0.5)`; ctx.lineWidth = 2; ctx.stroke();
+        }
+        // five acts - orbiting particles
+        for (let a = 0; a < acts.length; a++) {
+          const act = acts[a];
+          const orbitR = R * 0.58;
+          const baseAngle = act.angle + t * (0.4 + a * 0.07);
+          const x = cx + Math.cos(baseAngle) * orbitR;
+          const y = cy + Math.sin(baseAngle) * orbitR;
+          // trail
+          for (let tr = 0; tr < 12; tr++) {
+            const ta = baseAngle - tr * 0.08;
+            const tx = cx + Math.cos(ta) * orbitR;
+            const ty = cy + Math.sin(ta) * orbitR;
+            ctx.beginPath(); ctx.arc(tx, ty, 3 - tr * 0.2, 0, Math.PI * 2);
+            ctx.fillStyle = act.color.replace(')', `,${0.4 - tr * 0.03})`).replace('rgb', 'rgba');
+            ctx.fillStyle = act.color + '44';
+            ctx.fill();
+          }
+          // main orb
+          const grad = ctx.createRadialGradient(x, y, 0, x, y, 12);
+          grad.addColorStop(0, act.color);
+          grad.addColorStop(1, act.color + '00');
+          ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+          ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fillStyle = act.color; ctx.fill();
+          // label on hover / always for clarity
+          if (Math.cos(baseAngle) > 0) {
+            ctx.fillStyle = act.color; ctx.font = `10px 'JetBrains Mono'`;
+            ctx.fillText(act.name.split(' ')[0], x + 10, y + 4);
+          } else {
+            ctx.fillStyle = act.color; ctx.font = `10px 'JetBrains Mono'`;
+            ctx.textAlign = 'right'; ctx.fillText(act.name.split(' ')[0], x - 10, y + 4); ctx.textAlign = 'left';
+          }
+        }
+        // center symbol
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(t * 0.5);
+        const pulse = Math.sin(t * 2) * 4;
+        ctx.beginPath(); ctx.arc(0, 0, 26 + pulse, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(139,94,26,0.4)'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle = 'rgba(139,94,26,0.9)'; ctx.font = `bold 20px 'Cinzel'`;
+        ctx.textAlign = 'center'; ctx.fillText('ॐ', cx, cy + 7); ctx.textAlign = 'left';
+        t += 0.015; requestAnimationFrame(draw);
+      }
+      draw();
+      window.addEventListener('resize', resize);
+    })();
+
+    // ══════════════════════════════════════
+    // 9. ENTANGLEMENT
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-entangle');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      let state = 'superposition'; // superposition | measured
+      let spinA = null, spinB = null, t = 0;
+      let pA = { x: 0, y: 0 }, pB = { x: 0, y: 0 };
+      let trail = [];
+      function reset() {
+        state = 'superposition'; spinA = null; spinB = null; trail = [];
+        pA = { x: W / 2, y: H / 2 }; pB = { x: W / 2, y: H / 2 };
+      }
+      reset();
+      function draw() {
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        const speed = 0.8;
+        if (state === 'superposition') {
+          pA.x = lerp(pA.x, W * 0.15, 0.04); pA.y = H / 2 + Math.sin(t * 2) * H * 0.1;
+          pB.x = lerp(pB.x, W * 0.85, 0.04); pB.y = H / 2 + Math.sin(t * 2 + Math.PI) * H * 0.1;
+        }
+        // entanglement line
+        const midX = (pA.x + pB.x) / 2;
+        for (let i = 0; i < 3; i++) {
+          const offset = Math.sin(t * 4 + i * 2) * 8;
+          ctx.beginPath(); ctx.moveTo(pA.x, pA.y);
+          ctx.quadraticCurveTo(midX, H / 2 + offset + (i - 1) * 12, pB.x, pB.y);
+          ctx.strokeStyle = `rgba(46,110,120,${0.15 + i * 0.07})`; ctx.lineWidth = 1.5; ctx.stroke();
+        }
+        // draw particles
+        function drawParticle(x, y, spin, label, col) {
+          const grad = ctx.createRadialGradient(x, y, 0, x, y, 22);
+          grad.addColorStop(0, col); grad.addColorStop(1, col + '00');
+          ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+          ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill();
+          if (spin === null) {
+            // superposition: rotating dashes
+            for (let i = 0; i < 8; i++) {
+              const a = (i / 8) * Math.PI * 2 + t * 2;
+              ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * 13, y + Math.sin(a) * 13);
+              ctx.lineTo(x + Math.cos(a) * 18, y + Math.sin(a) * 18);
+              ctx.strokeStyle = `rgba(42,40,37,0.4)`; ctx.lineWidth = 2; ctx.stroke();
+            }
+            ctx.fillStyle = '#2a2825'; ctx.font = `11px 'JetBrains Mono'`; ctx.textAlign = 'center';
+            ctx.fillText('?', x, y + 4); ctx.textAlign = 'left';
+          } else {
+            ctx.fillStyle = '#fafaf8'; ctx.font = `bold 14px 'JetBrains Mono'`; ctx.textAlign = 'center';
+            ctx.fillText(spin === 'up' ? '↑' : '↓', x, y + 5); ctx.textAlign = 'left';
+          }
+          ctx.fillStyle = col; ctx.font = `11px 'JetBrains Mono'`; ctx.textAlign = 'center';
+          ctx.fillText(label, x, y - 28); ctx.textAlign = 'left';
+        }
+        drawParticle(pA.x, pA.y, spinA, 'Particle A', ACCENT);
+        drawParticle(pB.x, pB.y, spinB, 'Particle B', ACCENT2);
+        // source at center top
+        if (state === 'superposition') {
+          ctx.beginPath(); ctx.arc(W / 2, H * 0.15, 6, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(122,58,40,0.7)'; ctx.fill();
+          ctx.fillStyle = '#7a3a28'; ctx.font = `10px 'JetBrains Mono'`; ctx.textAlign = 'center';
+          ctx.fillText('source (γ)', W / 2, H * 0.1); ctx.textAlign = 'left';
+        }
+        if (state === 'measured') {
+          ctx.fillStyle = 'rgba(139,94,26,0.7)'; ctx.font = `11px 'JetBrains Mono'`; ctx.textAlign = 'center';
+          ctx.fillText('Correlated instantly — regardless of distance', W / 2, H - 10); ctx.textAlign = 'left';
+        }
+        t += 0.02; requestAnimationFrame(draw);
+      }
+      draw();
+      document.getElementById('ent-measure').addEventListener('click', () => {
+        if (state === 'superposition') {
+          state = 'measured';
+          spinA = Math.random() < 0.5 ? 'up' : 'down';
+          spinB = spinA === 'up' ? 'down' : 'up';
+        }
+      });
+      document.getElementById('ent-reset').addEventListener('click', reset);
+      window.addEventListener('resize', () => { resize(); reset(); });
+    })();
+
+    // ══════════════════════════════════════
+    // 10. MATTER-ANTIMATTER
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-matter');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      let pairs = [], photons = [], vacuumPairs = [], t = 0;
+      // vacuum fluctuations
+      function genVacuum() {
+        vacuumPairs = [];
+        for (let i = 0; i < 8; i++) {
+          vacuumPairs.push({ x: Math.random() * W, y: Math.random() * H, life: 0, maxLife: 60 + Math.random() * 80, phase: Math.random() * Math.PI * 2 });
+        }
+      }
+      genVacuum();
+      function createPair() {
+        const x = W / 2, y = H / 2;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random();
+        pairs.push({
+          mx: x, my: y, ax: x, ay: y,
+          mvx: Math.cos(angle) * speed, mvy: Math.sin(angle) * speed,
+          avx: -Math.cos(angle) * speed, avy: -Math.sin(angle) * speed,
+          life: 0, maxLife: 90, done: false
+        });
+        // incoming photon
+        photons.push({ x: 0, y: H / 2, vx: 4, vy: 0, life: 0, maxLife: 30, type: 'in' });
+      }
+      function draw() {
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, W, H);
+        // vacuum fluctuations
+        for (const vp of vacuumPairs) {
+          vp.life++;
+          if (vp.life > vp.maxLife) { vp.life = 0; vp.x = Math.random() * W; vp.y = Math.random() * H; }
+          const progress = vp.life / vp.maxLife;
+          const alpha = Math.sin(progress * Math.PI) * 0.3;
+          const r = 5 * Math.sin(progress * Math.PI);
+          ctx.beginPath(); ctx.arc(vp.x - r, vp.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(139,94,26,${alpha})`; ctx.fill();
+          ctx.beginPath(); ctx.arc(vp.x + r, vp.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(122,58,40,${alpha})`; ctx.fill();
+        }
+        // photons
+        for (const ph of photons) {
+          ph.x += ph.vx; ph.y += ph.vy; ph.life++;
+          const alpha = 1 - ph.life / ph.maxLife;
+          ctx.beginPath(); ctx.arc(ph.x, ph.y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(123,159,166,${alpha * 0.8})`; ctx.fill();
+          // wavy trail
+          for (let i = 0; i < 5; i++) {
+            ctx.beginPath(); ctx.arc(ph.x - i * 8, ph.y + Math.sin((ph.x - i * 8) * 0.1) * 4, 2, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(123,159,166,${alpha * 0.3})`; ctx.fill();
+          }
+        }
+        photons = photons.filter(p => p.life < p.maxLife);
+        // pairs
+        for (const p of pairs) {
+          p.mx += p.mvx; p.my += p.mvy;
+          p.ax += p.avx; p.ay += p.avy;
+          p.life++;
+          if (p.life > p.maxLife - 20 && !p.done) {
+            // annihilate -> two photons
+            photons.push({ x: p.mx, y: p.my, vx: 3, vy: -2, life: 0, maxLife: 40, type: 'out' });
+            photons.push({ x: p.mx, y: p.my, vx: -3, vy: 2, life: 0, maxLife: 40, type: 'out' });
+            p.done = true;
+          }
+          if (p.life >= p.maxLife) continue;
+          // matter
+          const gr = ctx.createRadialGradient(p.mx, p.my, 0, p.mx, p.my, 12);
+          gr.addColorStop(0, ACCENT); gr.addColorStop(1, ACCENT + '00');
+          ctx.beginPath(); ctx.arc(p.mx, p.my, 12, 0, Math.PI * 2); ctx.fillStyle = gr; ctx.fill();
+          ctx.beginPath(); ctx.arc(p.mx, p.my, 5, 0, Math.PI * 2); ctx.fillStyle = ACCENT; ctx.fill();
+          // antimatter
+          const gr2 = ctx.createRadialGradient(p.ax, p.ay, 0, p.ax, p.ay, 12);
+          gr2.addColorStop(0, ACCENT3); gr2.addColorStop(1, ACCENT3 + '00');
+          ctx.beginPath(); ctx.arc(p.ax, p.ay, 12, 0, Math.PI * 2); ctx.fillStyle = gr2; ctx.fill();
+          ctx.beginPath(); ctx.arc(p.ax, p.ay, 5, 0, Math.PI * 2); ctx.fillStyle = ACCENT3; ctx.fill();
+        }
+        pairs = pairs.filter(p => p.life < p.maxLife);
+        // labels
+        ctx.fillStyle = 'rgba(42,42,58,0.7)'; ctx.fillRect(0, 0, W, 18);
+        ctx.fillStyle = 'rgba(201,168,76,0.5)'; ctx.font = `10px 'JetBrains Mono'`;
+        ctx.fillText('vacuum fluctuations (virtual pairs continuously appear/disappear)', 8, 13);
+        t += 0.02; requestAnimationFrame(draw);
+      }
+      draw();
+      document.getElementById('mat-create').addEventListener('click', createPair);
+      document.getElementById('mat-reset').addEventListener('click', () => { pairs = []; photons = []; genVacuum(); });
+      window.addEventListener('resize', () => { resize(); genVacuum(); });
+    })();
+
+    // ══════════════════════════════════════
+    // 11. COSMIC EXPANSION
+    // ══════════════════════════════════════
+    (function () {
+      const c = document.getElementById('canvas-cosmos');
+      const ctx = c.getContext('2d');
+      let W, H;
+      function resize() { W = c.offsetWidth; H = c.offsetHeight; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); }
+      resize();
+      const slider = document.getElementById('cosmos-time');
+      const valEl = document.getElementById('cosmos-val');
+      let cosmosT = 50, animating = false, animDir = 1, animRaf;
+      const galaxies = Array.from({ length: 24 }, (_, i) => {
+        const angle = Math.random() * Math.PI * 2;
+        const r = 0.2 + Math.random() * 0.75;
+        return { angle, r, size: 2 + Math.random() * 3, color: Math.random() < 0.5 ? ACCENT : ACCENT2 };
+      });
+      function draw(ct) {
+        ctx.clearRect(0, 0, W, H); ctx.fillStyle = BG2; ctx.fillRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2;
+        const expansion = ct / 100;
+        const maxR = Math.min(W, H) * 0.42;
+        // background stars
+        for (let i = 0; i < 80; i++) {
+          const sx = (i * 137.5) % W, sy = (i * 73) % H;
+          ctx.beginPath(); ctx.arc(sx, sy, 0.8, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(237,232,216,0.3)'; ctx.fill();
+        }
+        // CMB glow at outer edge
+        if (ct < 5) {
+          const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * expansion * 1.2 + 10);
+          grad.addColorStop(0, 'rgba(201,168,76,0.9)');
+          grad.addColorStop(0.5, 'rgba(160,112,96,0.4)');
+          grad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath(); ctx.arc(cx, cy, maxR * expansion * 1.2 + 10, 0, Math.PI * 2);
+          ctx.fillStyle = grad; ctx.fill();
+        }
+        // expansion ring
+        if (expansion > 0.01) {
+          ctx.beginPath(); ctx.arc(cx, cy, maxR * expansion, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(201,168,76,${0.15 + expansion * 0.1})`; ctx.lineWidth = 1; ctx.stroke();
+        }
+        // galaxies
+        for (const g of galaxies) {
+          const r = g.r * maxR * expansion;
+          const x = cx + Math.cos(g.angle) * r;
+          const y = cy + Math.sin(g.angle) * r;
+          if (r > maxR * 1.05) continue;
+          // mini galaxy spiral
+          for (let arm = 0; arm < 2; arm++) {
+            for (let s = 0; s < 8; s++) {
+              const sa = g.angle * 3 + arm * Math.PI + s * 0.4;
+              const sr = s * g.size * 0.4;
+              ctx.beginPath(); ctx.arc(x + Math.cos(sa) * sr, y + Math.sin(sa) * sr, 0.8, 0, Math.PI * 2);
+              ctx.fillStyle = g.color; ctx.fill();
+            }
+          }
+          ctx.beginPath(); ctx.arc(x, y, g.size, 0, Math.PI * 2); ctx.fillStyle = g.color; ctx.fill();
+        }
+        // center
+        if (ct < 8) {
+          const bgr = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30);
+          bgr.addColorStop(0, 'rgba(255,255,255,0.9)'); bgr.addColorStop(1, 'rgba(201,168,76,0)');
+          ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI * 2); ctx.fillStyle = bgr; ctx.fill();
+          ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = `10px 'JetBrains Mono'`; ctx.textAlign = 'center';
+          ctx.fillText('Big Bang', cx, cy + 22); ctx.textAlign = 'left';
+        }
+        // label
+        ctx.fillStyle = 'rgba(201,168,76,0.6)'; ctx.font = `11px 'JetBrains Mono'`;
+        const age = (ct / 100 * 13.8).toFixed(1);
+        ctx.fillText(`~${age} billion years`, 8, H - 10);
+        ctx.fillStyle = 'rgba(123,159,166,0.5)'; ctx.textAlign = 'right';
+        ctx.fillText(ct < 50 ? 'expansion' : 'dark energy dominated', W - 8, H - 10); ctx.textAlign = 'left';
+      }
+      slider.addEventListener('input', () => {
+        cosmosT = +slider.value;
+        valEl.textContent = `t = ${cosmosT}`;
+        draw(cosmosT);
+      });
+      draw(cosmosT);
+      let animT = cosmosT, animRunning = false;
+      document.getElementById('cosmos-animate').addEventListener('click', () => {
+        if (animRunning) { cancelAnimationFrame(animRaf); animRunning = false; return; }
+        animRunning = true;
+        let dir = 1;
+        function step() {
+          animT += dir * 0.4;
+          if (animT >= 100) { dir = -1; } else if (animT <= 0) { dir = 1; }
+          cosmosT = Math.round(animT);
+          slider.value = cosmosT; valEl.textContent = `t = ${cosmosT}`;
+          draw(cosmosT);
+          if (animRunning) animRaf = requestAnimationFrame(step);
+        }
+        step();
+      });
+      window.addEventListener('resize', () => { resize(); draw(cosmosT); });
+    })();
+  </script>
+</body>
+
+</html>
