@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ashvins Health AI — Microsoft for Startups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── TOKENS ── */
+:root {
+  --bg:        #080C10;
+  --surface:   #0D1117;
+  --surface2:  #141B22;
+  --border:    #1E2A38;
+  --border2:   #2A3A4E;
+  --ink:       #E8EDF2;
+  --ink2:      #8FA0B4;
+  --ink3:      #4A6070;
+  --azure:     #00A3E0;   /* Microsoft Azure blue */
+  --azure2:    #0078D4;
+  --azure-dim: rgba(0,163,224,0.12);
+  --azure-glow:rgba(0,163,224,0.25);
+  --green:     #00CC6A;
+  --green-dim: rgba(0,204,106,0.1);
+  --amber:     #FFB900;
+  --red:       #E74856;
+  --shadow:    0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* ── BASE ── */
+html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--ink); }
+body { font-family:'Syne',sans-serif; }
+
+/* ── DECK ── */
+#deck {
+  width:100vw; height:100vh;
+  position:relative; overflow:hidden;
+  cursor:none;
+}
+
+/* ── SLIDES ── */
+.slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  padding:52px 64px 44px;
+  opacity:0; pointer-events:none;
+  transition:opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+  transform:translateX(40px);
+  background:var(--bg);
+  overflow:hidden;
+}
+.slide.active  { opacity:1; pointer-events:all; transform:translateX(0); }
+.slide.exiting { opacity:0; transform:translateX(-40px); }
+
+/* ── AMBIENT GRID ── */
+.slide::before {
+  content:'';
+  position:absolute; inset:0; z-index:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size:60px 60px;
+  opacity:.25;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+}
+.slide > * { position:relative; z-index:1; }
+
+/* ── HUD ── */
+#hud {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; gap:16px;
+  padding:10px 64px;
+  background:linear-gradient(to top, rgba(8,12,16,.98) 60%, transparent);
+  border-top:1px solid var(--border);
+}
+.hud-id   { font-family:'DM Mono',monospace; font-size:11px; color:var(--ink3); min-width:52px; }
+#dots     { display:flex; gap:6px; flex:1; align-items:center; }
+.dot      { width:6px; height:6px; border-radius:50%; background:var(--border2); cursor:pointer; transition:all .25s; }
+.dot.on   { background:var(--azure); width:20px; border-radius:3px; }
+#slide-label { font-size:11px; color:var(--ink3); flex:1; text-align:center; letter-spacing:.06em; text-transform:uppercase; }
+.nav-btn {
+  background:transparent; border:1px solid var(--border2); border-radius:6px;
+  color:var(--ink2); font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
+  width:34px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.nav-btn:hover { border-color:var(--azure); color:var(--azure); background:var(--azure-dim); }
+.nav-btn.primary { background:var(--azure); border-color:var(--azure); color:#fff; }
+.nav-btn.primary:hover { background:#0090C8; }
+#kbd-hint { font-family:'DM Mono',monospace; font-size:10px; color:var(--ink3); }
+
+/* ── CURSOR ── */
+#cursor {
+  position:fixed; width:10px; height:10px; border-radius:50%;
+  background:var(--azure); pointer-events:none; z-index:999;
+  transform:translate(-50%,-50%);
+  transition:transform .08s, opacity .2s;
+  mix-blend-mode:screen;
+}
+#cursor-ring {
+  position:fixed; width:36px; height:36px; border-radius:50%;
+  border:1px solid rgba(0,163,224,.4); pointer-events:none; z-index:998;
+  transform:translate(-50%,-50%);
+  transition:transform .18s ease-out;
+}
+
+/* ── SLIDE LABEL ── */
+.slide-tag {
+  font-family:'DM Mono',monospace; font-size:11px; color:var(--azure);
+  letter-spacing:.1em; text-transform:uppercase; margin-bottom:24px;
+  display:flex; align-items:center; gap:10px;
+}
+.slide-tag::before {
+  content:''; display:block; width:24px; height:1px; background:var(--azure);
+}
+
+/* ── HEADINGS ── */
+.h1 {
+  font-family:'Syne',sans-serif; font-size:clamp(36px,4.5vw,58px);
+  font-weight:800; line-height:1.05; letter-spacing:-.02em;
+  color:var(--ink); margin-bottom:8px;
+}
+.h1 em { font-style:normal; color:var(--azure); }
+.h2 {
+  font-family:'Instrument Serif',serif; font-size:clamp(28px,3.5vw,44px);
+  font-weight:400; line-height:1.15; color:var(--ink); margin-bottom:8px;
+}
+.h2 em { color:var(--azure); font-style:italic; }
+.sub {
+  font-size:clamp(13px,1.4vw,16px); color:var(--ink2); line-height:1.65;
+  max-width:680px; font-weight:400;
+}
+.mono { font-family:'DM Mono',monospace; }
+
+/* ── ACCENT LINE ── */
+.accent-line {
+  width:48px; height:3px; background:var(--azure); border-radius:2px;
+  margin-bottom:32px;
+}
+
+/* ── STAT CARDS ── */
+.stats { display:flex; gap:16px; margin-top:32px; }
+.stat-card {
+  flex:1; padding:20px 22px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; position:relative; overflow:hidden;
+}
+.stat-card::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--azure);
+}
+.stat-num {
+  font-family:'Syne',sans-serif; font-size:clamp(26px,3vw,38px);
+  font-weight:800; color:var(--azure); line-height:1; margin-bottom:6px;
+}
+.stat-label { font-size:12px; color:var(--ink2); line-height:1.4; }
+.stat-src   { font-family:'DM Mono',monospace; font-size:10px; color:var(--ink3); margin-top:8px; }
+
+/* ── FLOW PIPELINE ── */
+.pipeline {
+  display:flex; align-items:stretch; gap:0; margin-top:36px;
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  overflow:hidden;
+}
+.pipe-step {
+  flex:1; padding:20px 18px; border-right:1px solid var(--border);
+  position:relative;
+}
+.pipe-step:last-child { border-right:none; }
+.pipe-step::after {
+  content:'›'; position:absolute; right:-10px; top:50%;
+  transform:translateY(-50%); color:var(--azure); font-size:18px; font-weight:700;
+  z-index:2;
+}
+.pipe-step:last-child::after { display:none; }
+.pipe-icon { font-size:22px; margin-bottom:8px; }
+.pipe-title { font-size:12px; font-weight:700; color:var(--ink); margin-bottom:4px; letter-spacing:.03em; }
+.pipe-detail { font-family:'DM Mono',monospace; font-size:10px; color:var(--ink3); line-height:1.5; }
+.pipe-badge {
+  display:inline-block; margin-top:8px; padding:2px 8px;
+  background:var(--azure-dim); border:1px solid var(--azure-glow);
+  border-radius:4px; font-family:'DM Mono',monospace; font-size:9px;
+  color:var(--azure); letter-spacing:.05em;
+}
+
+/* ── COMPARISON TABLE ── */
+.comp-table { width:100%; border-collapse:collapse; margin-top:28px; font-size:13px; }
+.comp-table th {
+  padding:10px 14px; text-align:left; font-size:11px; font-weight:600;
+  letter-spacing:.07em; text-transform:uppercase; color:var(--ink3);
+  border-bottom:1px solid var(--border2);
+}
+.comp-table th.us { color:var(--azure); }
+.comp-table td {
+  padding:11px 14px; border-bottom:1px solid var(--border);
+  color:var(--ink2); vertical-align:middle;
+}
+.comp-table tr.ashvins td { color:var(--ink); background:var(--azure-dim); }
+.comp-table td.cap { color:var(--ink); font-weight:500; font-size:13px; }
+.tick  { color:var(--green); font-size:15px; }
+.cross { color:var(--ink3); font-size:13px; }
+.part  { color:var(--amber); font-size:13px; }
+
+/* ── EVIDENCE CARDS ── */
+.ev-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:28px; }
+.ev-card {
+  padding:22px 20px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; position:relative; overflow:hidden;
+}
+.ev-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--green);
+}
+.ev-num { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--green); margin-bottom:6px; }
+.ev-desc { font-size:12px; color:var(--ink); font-weight:600; margin-bottom:6px; }
+.ev-detail { font-size:11px; color:var(--ink3); line-height:1.55; }
+.ev-src { font-family:'DM Mono',monospace; font-size:10px; color:var(--azure); margin-top:10px; }
+
+/* ── ECON CARDS ── */
+.econ-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:28px; }
+.econ-card {
+  padding:20px 18px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; overflow:hidden; position:relative;
+}
+.econ-card::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+  background:var(--border2);
+}
+.econ-card.green::after { background:var(--green); }
+.econ-card.azure::after { background:var(--azure); }
+.econ-card.amber::after { background:var(--amber); }
+.econ-head { font-size:11px; color:var(--ink3); margin-bottom:10px; letter-spacing:.05em; text-transform:uppercase; }
+.econ-val  { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; margin-bottom:6px; }
+.econ-val.green { color:var(--green); }
+.econ-val.azure { color:var(--azure); }
+.econ-val.amber { color:var(--amber); }
+.econ-sub  { font-size:11px; color:var(--ink3); line-height:1.5; }
+
+/* ── MSFT STACK SECTION ── */
+.stack-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:28px; }
+.stack-card {
+  padding:20px 22px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; display:flex; gap:14px; align-items:flex-start;
+}
+.stack-icon {
+  width:38px; height:38px; border-radius:8px; background:var(--azure-dim);
+  border:1px solid var(--azure-glow); display:flex; align-items:center;
+  justify-content:center; font-size:18px; flex-shrink:0;
+}
+.stack-title { font-size:13px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+.stack-desc  { font-size:11px; color:var(--ink3); line-height:1.55; }
+.stack-badge {
+  display:inline-block; margin-top:8px; padding:2px 8px;
+  background:var(--azure-dim); border:1px solid var(--azure-glow);
+  border-radius:4px; font-family:'DM Mono',monospace; font-size:9px;
+  color:var(--azure); letter-spacing:.04em;
+}
+
+/* ── ROADMAP ── */
+.road-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:28px; }
+.road-card {
+  padding:18px 16px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; position:relative;
+}
+.road-q { font-family:'DM Mono',monospace; font-size:10px; color:var(--azure); margin-bottom:8px; letter-spacing:.08em; }
+.road-title { font-size:13px; font-weight:700; color:var(--ink); margin-bottom:10px; }
+.road-items { list-style:none; }
+.road-items li { font-size:11px; color:var(--ink3); margin-bottom:5px; padding-left:12px; position:relative; }
+.road-items li::before { content:'—'; position:absolute; left:0; color:var(--azure); }
+.road-milestone {
+  margin-top:12px; padding:8px 10px; background:var(--green-dim);
+  border:1px solid rgba(0,204,106,.2); border-radius:6px;
+  font-family:'DM Mono',monospace; font-size:10px; color:var(--green);
+}
+
+/* ── ASK LAYOUT ── */
+.ask-split { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:28px; align-items:start; }
+.ask-left { }
+.ask-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  overflow:hidden;
+}
+.ask-card-head {
+  padding:16px 22px; background:var(--azure); display:flex; align-items:center; gap:10px;
+}
+.ask-card-head-title { font-size:13px; font-weight:700; color:#fff; letter-spacing:.03em; }
+.ask-card-body { padding:20px 22px; display:flex; flex-direction:column; gap:10px; }
+.ask-line { display:flex; justify-content:space-between; align-items:baseline; }
+.ask-line-label { font-size:12px; color:var(--ink2); }
+.ask-line-val { font-family:'DM Mono',monospace; font-size:12px; color:var(--green); font-weight:500; }
+.ask-total { padding:14px 22px; background:var(--azure-dim); border-top:1px solid var(--border2); display:flex; justify-content:space-between; align-items:center; }
+.ask-total-label { font-size:13px; font-weight:700; color:var(--ink); }
+.ask-total-val { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--azure); }
+
+.mentor-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  overflow:hidden;
+}
+.mentor-head {
+  padding:16px 22px; background:linear-gradient(135deg,#0D3B5E,#0A2840);
+  border-bottom:1px solid var(--border2);
+}
+.mentor-head-title { font-size:13px; font-weight:700; color:var(--azure); }
+.mentor-head-sub { font-size:11px; color:var(--ink3); margin-top:2px; }
+.mentor-items { padding:20px 22px; display:flex; flex-direction:column; gap:12px; }
+.mentor-item { display:flex; gap:12px; align-items:flex-start; }
+.mentor-dot { width:6px; height:6px; border-radius:50%; background:var(--azure); margin-top:5px; flex-shrink:0; }
+.mentor-text { font-size:12px; color:var(--ink2); line-height:1.55; }
+.mentor-text strong { color:var(--ink); font-weight:600; }
+
+/* ── CLOSING ── */
+.close-center {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; text-align:center; gap:0;
+}
+.close-tagline {
+  font-family:'Instrument Serif',serif; font-size:clamp(28px,3.8vw,52px);
+  font-weight:400; line-height:1.2; color:var(--ink); max-width:800px;
+  margin-bottom:32px;
+}
+.close-tagline em { font-style:italic; color:var(--azure); }
+.contact-row { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-top:20px; }
+.contact-pill {
+  padding:8px 18px; border:1px solid var(--border2); border-radius:100px;
+  font-family:'DM Mono',monospace; font-size:12px; color:var(--ink2);
+}
+
+/* ── COVER GLOW ── */
+.cover-glow {
+  position:absolute; width:600px; height:600px; border-radius:50%;
+  background:radial-gradient(circle, rgba(0,163,224,.12) 0%, transparent 70%);
+  top:-100px; right:-150px; pointer-events:none;
+}
+.cover-glow2 {
+  position:absolute; width:300px; height:300px; border-radius:50%;
+  background:radial-gradient(circle, rgba(0,204,106,.07) 0%, transparent 70%);
+  bottom:60px; left:80px; pointer-events:none;
+}
+
+/* ── LOGOS ── */
+.logo-row { display:flex; align-items:center; gap:10px; margin-bottom:40px; }
+.logo-pill {
+  padding:5px 14px; border:1px solid var(--border2); border-radius:6px;
+  font-family:'DM Mono',monospace; font-size:11px; color:var(--ink3);
+  letter-spacing:.04em;
+}
+.logo-sep { color:var(--border2); font-size:14px; }
+
+/* ── ANIM ── */
+.anim-1 { animation:fadeUp .5s .05s both; }
+.anim-2 { animation:fadeUp .5s .15s both; }
+.anim-3 { animation:fadeUp .5s .25s both; }
+.anim-4 { animation:fadeUp .5s .35s both; }
+.anim-5 { animation:fadeUp .5s .45s both; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── NOTES ── */
+#notes-panel {
+  position:fixed; bottom:52px; left:0; right:0;
+  background:rgba(8,12,16,.97); border-top:1px solid var(--border2);
+  padding:18px 64px; font-size:13px; color:var(--ink2);
+  line-height:1.6; max-height:180px; overflow-y:auto;
+  transform:translateY(100%); transition:transform .3s;
+  z-index:90; display:none;
+}
+#notes-panel.open { display:block; transform:translateY(0); }
+
+/* ── PROGRESS BAR ── */
+#progress {
+  position:fixed; top:0; left:0; height:2px;
+  background:linear-gradient(90deg, var(--azure), var(--green));
+  transition:width .4s ease; z-index:200;
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<div id="deck">
+
+<!-- ░░░░ SLIDE 1 — COVER ░░░░ -->
+<div class="slide active" id="s1"
+  data-label="Cover"
+  data-notes="Good evening Vivek. Thank you for the time. I'm Manu Vahan, final-year CS and AI at Rishihood University. I'm going to show you why outpatient chronic care in India is a broken infrastructure problem — and how Ashvins Health AI is the fix. 15 minutes. Let's go.">
+  <div class="cover-glow"></div>
+  <div class="cover-glow2"></div>
+  <div class="logo-row anim-1">
+    <span class="logo-pill">ASHVINS HEALTH AI</span>
+    <span class="logo-sep">×</span>
+    <span class="logo-pill" style="color:var(--azure);border-color:var(--azure-glow);">MICROSOFT FOR STARTUPS</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div class="slide-tag anim-2">Pitch · Evening Session · 2026</div>
+    <div class="h1 anim-2" style="font-size:clamp(40px,5.5vw,72px);margin-bottom:16px;">
+      Automating the<br/><em>Outpatient Touchpoint</em>
+    </div>
+    <p class="sub anim-3" style="font-size:15px;max-width:620px;margin-bottom:36px;">
+      A voice-first AI monitoring layer that bridges the silence between clinical visits — for India's 101 million chronic disease patients. No app. No wearable. Just a phone call.
+    </p>
+    <div class="stats anim-4" style="max-width:680px;">
+      <div class="stat-card">
+        <div class="stat-num">101M</div>
+        <div class="stat-label">Indians with Type 2 Diabetes</div>
+        <div class="stat-src">IDF Atlas, 2023</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">60.5%</div>
+        <div class="stat-label">Medication non-adherence rate</div>
+        <div class="stat-src">Sharma et al., 2014</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">$31.7B</div>
+        <div class="stat-label">Annual burden, poorly managed T2D</div>
+        <div class="stat-src">India alone</div>
+      </div>
+    </div>
+  </div>
+  <div class="anim-5" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);">
+    Manu Vahan &nbsp;·&nbsp; manu.v23csai@nst.rishihood.edu.in &nbsp;·&nbsp; Rishihood University
+  </div>
+</div>
+
+<!-- ░░░░ SLIDE 2 — THE PROBLEM ░░░░ -->
+<div class="slide" id="s2"
+  data-label="The Problem"
+  data-notes="The moment a patient walks out of a clinic, their care effectively stops. The doctor has no data until the next appointment — 4 to 12 weeks later. They're flying blind. The only detection mechanism for non-adherence or symptom deterioration is asking the patient what they remember. Studies show that's accurate less than half the time. This is not a patient compliance problem — it's an infrastructure failure.">
+  <div class="slide-tag anim-1">01 · The Problem</div>
+  <div class="h2 anim-2">Care stops the moment<br/>the patient <em>leaves the clinic.</em></div>
+  <div class="accent-line anim-2"></div>
+  <p class="sub anim-3">India's chronic disease crisis is fundamentally an outpatient data gap. Clinicians act on retrospective recall — accurate less than 50% of the time for medication history. No structured mechanism exists between visits.</p>
+  <div class="stats anim-4" style="margin-top:28px;">
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--red);">60.5%</div>
+      <div class="stat-label">Medication non-adherence among Indian T2D outpatients. Only detected weeks later at next visit.</div>
+      <div class="stat-src">Sharma et al., 2014 · Indian J Endocrinol Metab</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--amber);">8–14%</div>
+      <div class="stat-label">30-day readmission rate for poorly controlled diabetes in Indian private hospitals. Preventable.</div>
+      <div class="stat-src">Kaveeshwar & Cornwall, 2014</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">1:483</div>
+      <div class="stat-label">India's nurse-to-patient ratio. WHO recommends 1:300. Manual follow-up calls are impossible to scale.</div>
+      <div class="stat-src">WHO, 2022</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--green);">37%</div>
+      <div class="stat-label">Drop in microvascular complications per 1% HbA1c improvement. The data exists to act — but clinicians can't see it.</div>
+      <div class="stat-src">UKPDS, 1998 · Lancet</div>
+    </div>
+  </div>
+</div>
+
+<!-- ░░░░ SLIDE 3 — THE SOLUTION ░░░░ -->
+<div class="slide" id="s3"
+  data-label="The Solution"
+  data-notes="Ashvin is an AI agent that calls patients every day on a standard phone. No app, no wearable, no data entry. It conducts a structured 3–5 minute health check-in in Hindi or English, extracts medication adherence signals, symptom trajectory, and behavioural indicators — and synthesises them into a monthly clinician report and a proprietary Symptom Volatility Index score. The whole thing runs on infrastructure you will recognise: Azure, Whisper, GPT-4o mini.">
+  <div class="slide-tag anim-1">02 · The Solution</div>
+  <div class="h2 anim-2"><em>Ashvin</em> — an AI agent that calls<br/>your patients. Every single day.</div>
+  <div class="accent-line anim-2"></div>
+  <p class="sub anim-3">Voice-based monitoring via standard phone calls. Built for India's real digital behaviour — 820M active SIM cards, 350M smartphones. No app required.</p>
+  <div class="pipeline anim-4">
+    <div class="pipe-step">
+      <div class="pipe-icon">📞</div>
+      <div class="pipe-title">Daily Call</div>
+      <div class="pipe-detail">Any phone<br/>Any network<br/>3–5 min structured check-in</div>
+      <span class="pipe-badge">Exotel India API</span>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon">🎙️</div>
+      <div class="pipe-title">Voice AI</div>
+      <div class="pipe-detail">Hindi + English<br/>Code-switching<br/>IndicSUPERB validated</div>
+      <span class="pipe-badge">Whisper large-v3</span>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon">🧠</div>
+      <div class="pipe-title">LLM Extraction</div>
+      <div class="pipe-detail">Adherence signals<br/>Symptom trajectory<br/>Mood & behaviour</div>
+      <span class="pipe-badge">GPT-4o mini · Azure OpenAI</span>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon">📊</div>
+      <div class="pipe-title">SVI Score</div>
+      <div class="pipe-detail">Symptom Volatility Index<br/>0–100 weekly risk score<br/>Novel composite metric</div>
+      <span class="pipe-badge">Proprietary algorithm</span>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon">🩺</div>
+      <div class="pipe-title">Clinical Report</div>
+      <div class="pipe-detail">Monthly PDF + dashboard<br/>Early risk alerts<br/>Physician-ready summary</div>
+      <span class="pipe-badge">Azure Mumbai · DPDP 2023</span>
+    </div>
+  </div>
+  <div class="anim-5" style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+    <span class="pipe-badge" style="font-size:10px;">No app required</span>
+    <span class="pipe-badge" style="font-size:10px;">Hindi + English</span>
+    <span class="pipe-badge" style="font-size:10px;">ABDM-ready (FHIR)</span>
+    <span class="pipe-badge" style="font-size:10px;">DPDP Act 2023 compliant</span>
+    <span class="pipe-badge" style="font-size:10px;">RTM CPT-code revenue pathway</span>
+    <span class="pipe-badge" style="font-size:10px;background:var(--azure-dim);border-color:var(--azure-glow);color:var(--azure);">Runs on Azure infrastructure</span>
+  </div>
+</div>
+
+<!-- ░░░░ SLIDE 4 — MARKET GAP ░░░░ -->
+<div class="slide" id="s4"
+  data-label="Market Gap"
+  data-notes="No player today owns continuous outpatient voice monitoring as hospital-integrated infrastructure in India. Telemedicine is reactive. Apps have sub-10% 90-day retention in chronic care. Wearables are ₹8,000 to ₹50,000 per device — inaccessible. And manual follow-up calls don't scale with a 1:483 nurse ratio. We are the only solution that hits all five capability dimensions simultaneously.">
+  <div class="slide-tag anim-1">03 · Market Gap</div>
+  <div class="h2 anim-2">Nothing does <em>all of this</em> simultaneously.<br/>Until now.</div>
+  <div class="accent-line anim-2"></div>
+  <table class="comp-table anim-3">
+    <thead>
+      <tr>
+        <th style="width:30%;">Capability</th>
+        <th class="us" style="width:15%;text-align:center;">Ashvins AI</th>
+        <th style="width:14%;text-align:center;">Telemedicine</th>
+        <th style="width:14%;text-align:center;">Health Apps</th>
+        <th style="width:14%;text-align:center;">Wearables</th>
+        <th style="width:13%;text-align:center;">Manual Calls</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="ashvins">
+        <td class="cap">Continuous daily monitoring</td>
+        <td style="text-align:center;"><span class="tick">✓</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="part">~</span></td>
+        <td style="text-align:center;"><span class="tick">✓</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+      </tr>
+      <tr>
+        <td class="cap">No smartphone or device required</td>
+        <td style="text-align:center;color:var(--azure);"><span class="tick">✓</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="tick" style="color:var(--green);">✓</span></td>
+      </tr>
+      <tr class="ashvins">
+        <td class="cap">Medication adherence extraction</td>
+        <td style="text-align:center;"><span class="tick">✓</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="part">~</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="part">~</span></td>
+      </tr>
+      <tr>
+        <td class="cap">Structured clinician-ready output</td>
+        <td style="text-align:center;color:var(--azure);"><span class="tick">✓</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+      </tr>
+      <tr class="ashvins">
+        <td class="cap">India cost-scalable (≤ ₹500/pt/mo)</td>
+        <td style="text-align:center;"><span class="tick">✓</span></td>
+        <td style="text-align:center;"><span class="part">~</span></td>
+        <td style="text-align:center;"><span class="tick" style="color:var(--green);">✓</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+        <td style="text-align:center;"><span class="cross">✗</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="anim-4" style="margin-top:20px;padding:14px 20px;background:var(--azure-dim);border:1px solid var(--azure-glow);border-radius:8px;font-size:13px;color:var(--ink2);font-style:italic;">
+    "No player today owns continuous outpatient voice monitoring as hospital-integrated infrastructure in India. <strong style="color:var(--ink);">That is the category Ashvins is building.</strong>"
+  </div>
+</div>
+
+<!-- ░░░░ SLIDE 5 — TRACTION & EVIDENCE ░░░░ -->
+<div class="slide" id="s5"
+  data-label="Evidence Base"
+  data-notes="We are not building on faith. Three peer-reviewed pillars validate the technical approach. Telephone-based follow-up in Indian T2D cohorts shows statistically significant HbA1c improvement. Conversational AI agents consistently improve chronic care adherence across 17 randomised trials. And GPT-4 performs at USMLE passing threshold — LLM medical reasoning is mature. The full technical stack is proven. Integration is the work.">
+  <div class="slide-tag anim-1">04 · Evidence Base</div>
+  <div class="h2 anim-2">Three pillars of <em>peer-reviewed feasibility.</em></div>
+  <div class="accent-line anim-2"></div>
+  <div class="ev-grid anim-3">
+    <div class="ev-card">
+      <div class="ev-num">0.7% ↓</div>
+      <div class="ev-desc">HbA1c reduction via telephone follow-up in Indian T2D</div>
+      <div class="ev-detail">Statistically significant (p &lt; 0.01) at 12 months in a North Indian outpatient cohort versus standard care. Proof the core interaction model works in this exact population.</div>
+      <div class="ev-src">Kaur et al. · Diabetic Medicine · 2015</div>
+    </div>
+    <div class="ev-card">
+      <div class="ev-num">72%</div>
+      <div class="ev-desc">Patient acceptance of AI voice agents in post-ACS recovery</div>
+      <div class="ev-detail">Jadczyk et al. (2021). Laranjo et al. JAMIA 2018: reviewed 17 RCTs of conversational agents in chronic care — consistent improvements in medication adherence and self-efficacy across all conditions.</div>
+      <div class="ev-src">Jadczyk et al. · J Med Internet Res · 2021</div>
+    </div>
+    <div class="ev-card">
+      <div class="ev-num">USMLE ≥</div>
+      <div class="ev-desc">LLM medical reasoning is now clinically mature</div>
+      <div class="ev-detail">Nori et al. (2023, Microsoft Research) — GPT-4 at or above passing threshold. Indian language code-switching addressed by Whisper large-v3 validated on IndicSUPERB (Javed et al., 2023).</div>
+      <div class="ev-src">Nori et al. · Microsoft Research · arXiv:2303.13375</div>
+    </div>
+  </div>
+  <div class="anim-4" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+    <div style="padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Technical Stack — Fully Proven</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--azure);">Exotel → Whisper large-v3 → GPT-4o mini → Azure → FHIR output</div>
+    </div>
+    <div style="padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Integration Gap = Our Moat</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green);">No academic or commercial team in India has published continuous voice-based outpatient monitoring of this design</div>
+    </div>
+  </div>
+</div>
+
+<!-- ░░░░ SLIDE 6 — UNIT ECONOMICS ░░░░ -->
+<div class="slide" id="s6"
+  data-label="Business Model"
+  data-notes="The model is B2B SaaS. Hospitals subscribe at ₹499 per patient per month — we've verified this against actual March 2026 API rates. Pilot infra cost is ₹245 per patient per month; at 500 plus patients it drops to ₹160, giving us 68% gross margin. The serviceable market at 5% penetration of India's 8,000 mid-tier private hospitals is ₹120 crore annually. Three expansion layers sit above the base: caregiver app subscriptions, enterprise licensing, and RTM insurance billing — analogous to US CPT codes 98975 to 98977.">
+  <div class="slide-tag anim-1">05 · Business Model</div>
+  <div class="h2 anim-2">Unit economics, <em>built from first principles.</em></div>
+  <div class="accent-line anim-2"></div>
+  <div class="econ-row anim-3">
+    <div class="econ-card azure">
+      <div class="econ-head">Price / patient / mo.</div>
+      <div class="econ-val azure">₹499</div>
+      <div class="econ-sub">B2B SaaS hospital subscription. Verified vs. ₹400–600 market range for remote care tools in India.</div>
+    </div>
+    <div class="econ-card">
+      <div class="econ-head">Infra cost — pilot</div>
+      <div class="econ-val" style="color:var(--ink2);">₹245</div>
+      <div class="econ-sub">Exotel ₹137 + Whisper ₹53 + GPT-4o mini ₹3 + AWS Mumbai ₹52. Live API rates, March 2026.</div>
+    </div>
+    <div class="econ-card">
+      <div class="econ-head">Infra cost — at scale</div>
+      <div class="econ-val" style="color:var(--ink2);">₹160</div>
+      <div class="econ-sub">AWS amortizes at volume. Whisper self-hosting reduces ASR cost further. Azure credits accelerate this.</div>
+    </div>
+    <div class="econ-card green">
+      <div class="econ-head">Gross margin at scale</div>
+      <div class="econ-val green">68%</div>
+      <div class="econ-sub">(₹499 − ₹160) ÷ ₹499. Market: ₹120Cr+ at 5% of ~8,000 mid-tier hospitals.</div>
+    </div>
+  </div>
+  <div class="anim-4" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;">
+    <div style="padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+      <div style="font-size:11px;color:var(--azure);font-weight:700;margin-bottom:5px;">👨‍👩‍👧 Caregiver App</div>
+      <div style="font-size:11px;color:var(--ink3);">Family subscription — real-time alerts, missed check-ins, behavioural shift notifications.</div>
+    </div>
+    <div style="padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+      <div style="font-size:11px;color:var(--azure);font-weight:700;margin-bottom:5px;">🏢 Enterprise Licensing</div>
+      <div style="font-size:11px;color:var(--ink3);">Multi-hospital chain contracts with volume discounts and white-label options.</div>
+    </div>
+    <div style="padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+      <div style="font-size:11px;color:var(--azure);font-weight:700;margin-bottom:5px;">🔄 Insurance RTM Billing</div>
+      <div style="font-size:11px;color:var(--ink3);">TPA reimbursement pathway — analogous to US CPT codes 98975–98977. Cost barrier eliminated.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ░░░░ SLIDE 7 — MICROSOFT ANGLE ░░░░ -->
+<div class="slide" id="s7"
+  data-label="Why Microsoft"
+  data-notes="I want to be direct about why this meeting matters. Ashvins is already designed around Microsoft infrastructure — Azure Mumbai for data residency and DPDP compliance, Azure OpenAI for the LLM layer, GitHub Copilot for development velocity. The Microsoft for Startups programme gives us Azure credits that directly compress our pilot infra cost, technical architecture review, and — most importantly — a connection into the Indian healthcare and enterprise sales channel that takes years to build independently. What I'm asking for is mentorship and the programme's backing.">
+  <div class="slide-tag anim-1">06 · Why Microsoft for Startups</div>
+  <div class="h2 anim-2">Ashvins is already built<br/>on <em>Azure infrastructure.</em></div>
+  <div class="accent-line anim-2"></div>
+  <p class="sub anim-3" style="margin-bottom:0;">This is not a cold ask. The architecture was designed around Microsoft's stack from day one.</p>
+  <div class="stack-grid anim-4">
+    <div class="stack-card">
+      <div class="stack-icon">☁️</div>
+      <div>
+        <div class="stack-title">Azure Mumbai Region — Data Residency</div>
+        <div class="stack-desc">All patient data stored on Indian servers in compliance with DPDP Act 2023 and ABDM requirements. Azure is the only hyperscaler with the Mumbai region footprint and healthcare compliance posture we need.</div>
+        <span class="stack-badge">Azure · t3.small + RDS equivalent</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🧠</div>
+      <div>
+        <div class="stack-title">Azure OpenAI — GPT-4o mini for Clinical Extraction</div>
+        <div class="stack-desc">The LLM extraction layer runs on Azure OpenAI, not direct OpenAI API — giving us enterprise SLAs, data processing agreements, and the audit trail a hospital-grade product requires.</div>
+        <span class="stack-badge">Azure OpenAI Service</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">⚡</div>
+      <div>
+        <div class="stack-title">Azure Credits → Compressed Pilot Cost</div>
+        <div class="stack-desc">Microsoft for Startups credits directly reduce our pilot infra line from ₹2,40,000 to near-zero — extending runway and letting us validate faster. Every rupee saved on infra goes toward clinical evidence.</div>
+        <span class="stack-badge">Founders Hub · up to $150K credits</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🤝</div>
+      <div>
+        <div class="stack-title">Enterprise Healthcare Channel Access</div>
+        <div class="stack-desc">Microsoft's relationships with Apollo, Fortis, Max, and Manipal hospital networks are the exact doors Ashvins needs to open. A warm introduction from Microsoft for Startups compresses a 3-year BD cycle to months.</div>
+        <span class="stack-badge">India Healthcare · Enterprise Sales</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ░░░░ SLIDE 8 — THE ASK ░░░░ -->
+<div class="slide" id="s8"
+  data-label="The Ask"
+  data-notes="Here is what I'm asking from you specifically. One: year-long mentorship from you as CTO — specifically on enterprise healthcare architecture, Azure AI product design, and navigating the Indian hospital sales motion. Two: Microsoft for Startups programme enrolment — Azure credits, GitHub Copilot access, and technical support. Three: if the pilot evidence is compelling at Month 6, an introduction to Microsoft's M12 fund or relevant co-investment partners. The Phase I pilot runs on ₹15 lakh over 12 months, 100 T2D patients, one to two private hospitals. That's the evidence base that unlocks everything downstream.">
+  <div class="slide-tag anim-1">07 · The Ask</div>
+  <div class="h2 anim-2">Two things. <em>Mentorship</em> and<br/>the programme's backing.</div>
+  <div class="accent-line anim-2"></div>
+  <div class="ask-split anim-3">
+    <div class="ask-left" style="display:flex;flex-direction:column;gap:14px;">
+      <div class="mentor-card">
+        <div class="mentor-head">
+          <div class="mentor-head-title">What I'm asking from you, Vivek</div>
+          <div class="mentor-head-sub">Year-long mentorship · CTO, Microsoft for Startups India</div>
+        </div>
+        <div class="mentor-items">
+          <div class="mentor-item">
+            <div class="mentor-dot"></div>
+            <div class="mentor-text"><strong>Enterprise healthcare architecture</strong> — how to build a system that hospital CIOs actually trust and procure</div>
+          </div>
+          <div class="mentor-item">
+            <div class="mentor-dot"></div>
+            <div class="mentor-text"><strong>Azure AI product design</strong> — positioning the SVI and clinical extraction pipeline for ABDM integration and regulatory approval</div>
+          </div>
+          <div class="mentor-item">
+            <div class="mentor-dot"></div>
+            <div class="mentor-text"><strong>India hospital sales motion</strong> — navigating procurement cycles, MoU structures, and multi-hospital chain BD from someone who has done it</div>
+          </div>
+          <div class="mentor-item">
+            <div class="mentor-dot"></div>
+            <div class="mentor-text"><strong>Investor introductions</strong> — M12 or relevant co-investment partners if Phase I evidence meets the bar at Month 6</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="ask-card">
+        <div class="ask-card-head">
+          <div class="ask-card-head-title">Microsoft for Startups Programme</div>
+        </div>
+        <div class="ask-card-body">
+          <div class="ask-line">
+            <span class="ask-line-label">Azure credits (Founders Hub)</span>
+            <span class="ask-line-val">up to $150K</span>
+          </div>
+          <div class="ask-line">
+            <span class="ask-line-label">Azure OpenAI access</span>
+            <span class="ask-line-val">Enterprise SLA</span>
+          </div>
+          <div class="ask-line">
+            <span class="ask-line-label">GitHub Copilot</span>
+            <span class="ask-line-val">Dev velocity</span>
+          </div>
+          <div class="ask-line">
+            <span class="ask-line-label">Technical architecture review</span>
+            <span class="ask-line-val">MS engineers</span>
+          </div>
+          <div class="ask-line">
+            <span class="ask-line-label">LinkedIn Startup accelerator</span>
+            <span class="ask-line-val">Hiring access</span>
+          </div>
+        </div>
+        <div class="ask-total" style="background:var(--azure-dim);">
+          <span class="ask-total-label">Impact: pilot infra cost</span>
+          <span class="ask-total-val" style="font-size:16px;color:var(--green);">₹2,40,000 → ~₹0</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
+        <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Phase I Pilot — Clinical Evidence</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+          <span style="font-size:12px;color:var(--ink2);">100 T2D patients · 1–2 hospitals · 12 months</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <span style="font-size:12px;color:var(--ink2);">Total grant requirement</span>
+          <span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--azure);">₹15,00,000</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ░░░░ SLIDE 9 — CLOSE ░░░░ -->
+<div class="slide" id="s9"
+  data-label="Thank You"
+  data-notes="101 million Indians deserve more than a prescription and silence. Ashvins Health AI is building the infrastructure that stays with the patient after they leave the clinic — continuous, voice-first, and built on Azure from the ground up. I would be honoured to have you as a mentor, Vivek. Thank you.">
+  <div class="cover-glow"></div>
+  <div class="cover-glow2"></div>
+  <div class="close-center">
+    <div class="slide-tag anim-1" style="justify-content:center;">08 · Thank You</div>
+    <div class="close-tagline anim-2">
+      101 million Indians deserve more than<br/>a prescription <em>and silence.</em>
+    </div>
+    <p class="sub anim-3" style="text-align:center;max-width:560px;">
+      Ashvins Health AI is building the infrastructure that stays with the patient after they leave the clinic — continuous, voice-first, and built on Azure from the ground up.
+    </p>
+    <div class="contact-row anim-4">
+      <span class="contact-pill">Manu Vahan</span>
+      <span class="contact-pill">manu.v23csai@nst.rishihood.edu.in</span>
+      <span class="contact-pill">Rishihood University · B.Tech CS & AI</span>
+    </div>
+    <div class="anim-5" style="display:flex;gap:14px;margin-top:28px;flex-wrap:wrap;justify-content:center;">
+      <span class="pipe-badge" style="font-size:11px;padding:6px 16px;">Pilot: 100 T2D patients · 12 months</span>
+      <span class="pipe-badge" style="font-size:11px;padding:6px 16px;background:var(--azure-dim);border-color:var(--azure-glow);color:var(--azure);">Built on Azure · DPDP 2023 compliant</span>
+      <span class="pipe-badge" style="font-size:11px;padding:6px 16px;">SVI patent filing · Month 11</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-id mono" id="slide-num">01 / 09</div>
+  <div id="dots"></div>
+  <div id="slide-label"></div>
+  <button class="nav-btn" id="btn-prev" title="Previous (←)">‹</button>
+  <button class="nav-btn primary" id="btn-next" title="Next (→)">›</button>
+  <div id="kbd-hint">← → · Space · N notes</div>
+</div>
+
+<!-- Notes -->
+<div id="notes-panel"></div>
+
+<script>
+const slides  = Array.from(document.querySelectorAll('.slide'));
+const dots    = document.getElementById('dots');
+const numEl   = document.getElementById('slide-num');
+const labelEl = document.getElementById('slide-label');
+const prog    = document.getElementById('progress');
+const notes   = document.getElementById('notes-panel');
+const N = slides.length;
+let cur = 0, notesOpen = false;
+
+// Build dots
+slides.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' on':'');
+  d.onclick = () => goTo(i);
+  dots.appendChild(d);
+});
+
+function goTo(n, dir=1) {
+  if (n < 0 || n >= N || n === cur) return;
+  slides[cur].classList.add('exiting');
+  slides[cur].classList.remove('active');
+  setTimeout(() => slides[cur < n ? cur : n+1]?.classList.remove('exiting'), 500);
+  // direction transform
+  slides[n].style.transform = dir > 0 ? 'translateX(40px)' : 'translateX(-40px)';
+  requestAnimationFrame(() => {
+    slides[n].style.transform = '';
+    slides[n].classList.add('active');
+  });
+  const old = cur; cur = n;
+  slides[old].classList.remove('active','exiting');
+  // reset anims
+  slides[cur].querySelectorAll('[class*="anim-"]').forEach(el => {
+    el.style.animation='none';
+    requestAnimationFrame(() => el.style.animation='');
+  });
+  update();
+}
+
+function next() { goTo(cur+1, 1); }
+function prev() { goTo(cur-1,-1); }
+
+function update() {
+  const pct = ((cur+1)/N)*100;
+  prog.style.width = pct+'%';
+  numEl.textContent = String(cur+1).padStart(2,'0') + ' / ' + String(N).padStart(2,'0');
+  labelEl.textContent = slides[cur].dataset.label || '';
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('on', i===cur));
+  notes.textContent = slides[cur].dataset.notes || '';
+  document.getElementById('btn-prev').disabled = cur === 0;
+  document.getElementById('btn-next').textContent = cur === N-1 ? '✓' : '›';
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' '||e.key==='ArrowDown') { e.preventDefault(); next(); }
+  if (e.key==='ArrowLeft'||e.key==='ArrowUp')                 { e.preventDefault(); prev(); }
+  if (e.key==='n'||e.key==='N') {
+    notesOpen = !notesOpen;
+    notes.classList.toggle('open', notesOpen);
+  }
+  if (!isNaN(e.key) && e.key!=='' && +e.key>=1 && +e.key<=N) goTo(+e.key-1);
+});
+
+// Click nav
+document.getElementById('btn-prev').onclick = prev;
+document.getElementById('btn-next').onclick = next;
+document.getElementById('deck').addEventListener('click', e => {
+  if (e.target.closest('#hud')||e.target.closest('#notes-panel')||e.target.closest('button')) return;
+  e.clientX > window.innerWidth * 0.55 ? next() : prev();
+});
+
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX+'px'; cursor.style.top = e.clientY+'px';
+  ring.style.left   = e.clientX+'px'; ring.style.top   = e.clientY+'px';
+});
+
+update();
+</script>
+</body>
+</html>
